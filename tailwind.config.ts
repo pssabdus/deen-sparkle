@@ -61,7 +61,21 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				'islamic-green': 'hsl(var(--islamic-green))',
+				'islamic-gold': 'hsl(var(--islamic-gold))',
+				'islamic-blue': 'hsl(var(--islamic-blue))',
+				'islamic-coral': 'hsl(var(--islamic-coral))',
+				'islamic-cream': 'hsl(var(--islamic-cream))'
+			},
+			boxShadow: {
+				'elegant': 'var(--shadow-elegant)',
+				'glow': 'var(--shadow-glow)'
+			},
+			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-gold': 'var(--gradient-gold)',
+				'gradient-subtle': 'var(--gradient-subtle)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
