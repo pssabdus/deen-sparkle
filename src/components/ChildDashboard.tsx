@@ -5,11 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Star, Flame, Book, Heart, Gift, LogOut } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Star, Flame, Book, Heart, Gift, LogOut, Award, Calendar } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import PrayerTracker from '@/components/PrayerTracker';
 import StoryReader from '@/components/StoryReader';
 import RewardStore from '@/components/RewardStore';
+import BadgeSystem from '@/components/BadgeSystem';
+import IslamicCompanion from '@/components/IslamicCompanion';
+import StreakTracker from '@/components/StreakTracker';
 
 interface UserProfile {
   id: string;
@@ -166,55 +170,129 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
           </Card>
         </div>
 
-        {/* Main Activities */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Prayer Tracker */}
-          <Card className="shadow-elegant">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-islamic-green">
-                🕌 Prayer Time
-              </CardTitle>
-              <CardDescription>Track your daily prayers</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <PrayerTracker 
-                childId={childProfile.id}
-                prayers={todayPrayers}
-                onPrayerUpdate={fetchTodayPrayers}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Story Reader */}
-          <Card className="shadow-elegant">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-islamic-blue">
-                📚 Islamic Stories
-              </CardTitle>
-              <CardDescription>Read beautiful Islamic stories</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <StoryReader childId={childProfile.id} />
-            </CardContent>
-          </Card>
-
-          {/* Reward Store */}
-          <Card className="shadow-elegant lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-islamic-gold">
-                🎁 Reward Store
-              </CardTitle>
-              <CardDescription>Spend your points on amazing rewards!</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <RewardStore 
-                childId={childProfile.id}
-                familyId={childProfile.family_id}
-                currentPoints={childProfile.total_points}
-              />
-            </CardContent>
-          </Card>
+        {/* Islamic Companion */}
+        <div className="mb-6">
+          <IslamicCompanion 
+            companion={{
+              type: childProfile.companion_type as 'angel' | 'pet' | 'wizard',
+              name: childProfile.companion_name,
+              personality: 'friendly',
+              level: childProfile.islamic_level,
+              happiness: 85,
+              energy: 90
+            }}
+            childName={childProfile.name}
+            points={childProfile.total_points}
+            streak={childProfile.current_streak}
+          />
         </div>
+
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="activities" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="activities">Activities</TabsTrigger>
+            <TabsTrigger value="badges">Badges</TabsTrigger>
+            <TabsTrigger value="streaks">Streaks</TabsTrigger>
+            <TabsTrigger value="stories">Stories</TabsTrigger>
+            <TabsTrigger value="rewards">Rewards</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="activities" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Prayer Tracker */}
+              <Card className="shadow-elegant">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-islamic-green">
+                    🕌 Prayer Time
+                  </CardTitle>
+                  <CardDescription>Track your daily prayers</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <PrayerTracker 
+                    childId={childProfile.id}
+                    prayers={todayPrayers}
+                    onPrayerUpdate={fetchTodayPrayers}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Quick Stats */}
+              <Card className="shadow-elegant">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-islamic-blue">
+                    📊 Today's Progress
+                  </CardTitle>
+                  <CardDescription>Your daily achievements</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">Prayers Completed</span>
+                    <Badge variant="secondary">
+                      {todayPrayers.filter((p: any) => p.completed_at).length}/5
+                    </Badge>
+                  </div>
+                  <Progress 
+                    value={(todayPrayers.filter((p: any) => p.completed_at).length / 5) * 100} 
+                    className="h-2" 
+                  />
+                  <div className="text-center pt-2">
+                    <p className="text-sm text-muted-foreground">
+                      Keep going! You're doing amazing! 🌟
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="badges">
+            <BadgeSystem 
+              childId={childProfile.id}
+              onBadgeEarned={(badge) => {
+                toast({
+                  title: "New Badge Earned! 🏆",
+                  description: `You earned the "${badge.name}" badge!`,
+                });
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="streaks">
+            <StreakTracker childId={childProfile.id} />
+          </TabsContent>
+
+          <TabsContent value="stories">
+            <Card className="shadow-elegant">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-islamic-blue">
+                  📚 Islamic Stories
+                </CardTitle>
+                <CardDescription>Read beautiful Islamic stories and learn</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <StoryReader childId={childProfile.id} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="rewards">
+            <Card className="shadow-elegant">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-islamic-gold">
+                  🎁 Reward Store
+                </CardTitle>
+                <CardDescription>Spend your points on amazing rewards!</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <RewardStore 
+                  childId={childProfile.id}
+                  familyId={childProfile.family_id}
+                  currentPoints={childProfile.total_points}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
