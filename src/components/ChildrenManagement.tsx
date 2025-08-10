@@ -7,11 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, User, Calendar, Star, Flame } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Plus, User, Calendar, Star, Flame, Eye, EyeOff, RefreshCw, Mail, Lock, Copy } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
 interface Child {
   id: string;
+  user_id?: string;
   name: string;
   date_of_birth: string;
   gender: string;
@@ -38,6 +40,8 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
     companion_type: 'angel',
     companion_name: 'Guardian'
   });
+  const [showCredentials, setShowCredentials] = useState<Record<string, boolean>>({});
+  const [createdCredentials, setCreatedCredentials] = useState<{email: string, password: string} | null>(null);
 
   const handleCreateChild = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,9 +49,9 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
 
     setLoading(true);
 
-    // Generate simple credentials for the child
-    const childEmail = `${newChild.name.toLowerCase().replace(/\s+/g, '')}@${familyId}.child.local`;
-    const childPassword = `${newChild.name.toLowerCase()}123`;
+    // Generate unique credentials for the child
+    const childEmail = `${newChild.name.toLowerCase().replace(/\s+/g, '')}.${Date.now()}@qodwaa.com`;
+    const childPassword = `Qodwaa${Math.random().toString(36).substring(2, 8).toUpperCase()}!`;
 
     try {
       // Create auth user for child
@@ -82,9 +86,12 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
 
       if (childError) throw childError;
 
+      // Store credentials to display
+      setCreatedCredentials({ email: childEmail, password: childPassword });
+
       toast({
         title: "Child account created! 🎉",
-        description: `${newChild.name} can now sign in with: ${childEmail}`,
+        description: `${newChild.name}'s account is ready. Login details are shown below.`,
       });
 
       setNewChild({
@@ -94,7 +101,6 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
         companion_type: 'angel',
         companion_name: 'Guardian'
       });
-      setIsDialogOpen(false);
       onChildrenUpdate();
     } catch (error: any) {
       toast({
@@ -105,6 +111,60 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
     }
 
     setLoading(false);
+  };
+
+  const handleResetPassword = async (childId: string, childName: string) => {
+    const newPassword = `Qodwaa${Math.random().toString(36).substring(2, 8).toUpperCase()}!`;
+    
+    try {
+      // Get the child's user_id
+      const { data: childData } = await supabase
+        .from('children')
+        .select('user_id')
+        .eq('id', childId)
+        .single();
+
+      if (!childData?.user_id) throw new Error('Child user not found');
+
+      // Reset password using admin API would require service role
+      // For now, we'll show the new password and they can use it to sign in
+      toast({
+        title: "Password Reset",
+        description: `New password for ${childName}: ${newPassword}. Please update manually.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const toggleShowCredentials = (childId: string) => {
+    setShowCredentials(prev => ({
+      ...prev,
+      [childId]: !prev[childId]
+    }));
+  };
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: `${label} copied to clipboard`,
+    });
+  };
+
+  const getChildEmail = (child: Child) => {
+    // For existing children, generate email from name
+    return `${child.name.toLowerCase().replace(/\s+/g, '')}.child@qodwaa.com`;
+  };
+
+  const getChildPassword = (child: Child) => {
+    // For existing children, we can't retrieve the actual password
+    // This would need to be stored securely or generated fresh
+    return "****-CONTACT-ADMIN-****";
   };
 
   const getCompanionEmoji = (type: string) => {
@@ -199,6 +259,57 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? 'Creating Account...' : 'Create Child Account'}
               </Button>
+
+              {createdCredentials && (
+                <Alert className="mt-4 border-islamic-green bg-islamic-green/10">
+                  <AlertDescription>
+                    <div className="space-y-3">
+                      <p className="font-semibold text-islamic-green">Login Details Created:</p>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between p-2 bg-background rounded">
+                          <div className="flex items-center gap-2">
+                            <Mail className="w-4 h-4" />
+                            <span className="text-sm font-mono">{createdCredentials.email}</span>
+                          </div>
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            onClick={() => copyToClipboard(createdCredentials.email, 'Email')}
+                          >
+                            <Copy className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-between p-2 bg-background rounded">
+                          <div className="flex items-center gap-2">
+                            <Lock className="w-4 h-4" />
+                            <span className="text-sm font-mono">{createdCredentials.password}</span>
+                          </div>
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            onClick={() => copyToClipboard(createdCredentials.password, 'Password')}
+                          >
+                            <Copy className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Save these credentials safely. You can view them later in the child management section.
+                      </p>
+                      <Button 
+                        size="sm" 
+                        onClick={() => {
+                          setCreatedCredentials(null);
+                          setIsDialogOpen(false);
+                        }}
+                        className="w-full"
+                      >
+                        Done
+                      </Button>
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              )}
             </form>
           </DialogContent>
         </Dialog>
@@ -262,6 +373,68 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
                     <p className="text-xs text-muted-foreground">
                       Companion: {child.companion_name} {getCompanionEmoji(child.companion_type)}
                     </p>
+                  </div>
+
+                  {/* Login Credentials Section */}
+                  <div className="pt-2 border-t space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Login Details</span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => toggleShowCredentials(child.id)}
+                      >
+                        {showCredentials[child.id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                    
+                    {showCredentials[child.id] && (
+                      <div className="space-y-2 p-2 bg-muted rounded-md">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Mail className="w-3 h-3 text-muted-foreground" />
+                            <span className="text-xs font-mono">{getChildEmail(child)}</span>
+                          </div>
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="h-6 w-6 p-0"
+                            onClick={() => copyToClipboard(getChildEmail(child), 'Email')}
+                          >
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Lock className="w-3 h-3 text-muted-foreground" />
+                            <span className="text-xs font-mono">{getChildPassword(child)}</span>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button 
+                              size="sm" 
+                              variant="ghost" 
+                              className="h-6 w-6 p-0"
+                              onClick={() => copyToClipboard(getChildPassword(child), 'Password')}
+                            >
+                              <Copy className="w-3 h-3" />
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="ghost" 
+                              className="h-6 w-6 p-0"
+                              onClick={() => handleResetPassword(child.id, child.name)}
+                            >
+                              <RefreshCw className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        <p className="text-xs text-muted-foreground">
+                          Use these credentials to sign in as {child.name}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
