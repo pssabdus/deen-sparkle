@@ -205,6 +205,7 @@ export type Database = {
           gender: string | null
           id: string
           islamic_level: number | null
+          login_email: string | null
           login_password: string | null
           longest_streak: number | null
           name: string
@@ -224,6 +225,7 @@ export type Database = {
           gender?: string | null
           id?: string
           islamic_level?: number | null
+          login_email?: string | null
           login_password?: string | null
           longest_streak?: number | null
           name: string
@@ -243,6 +245,7 @@ export type Database = {
           gender?: string | null
           id?: string
           islamic_level?: number | null
+          login_email?: string | null
           login_password?: string | null
           longest_streak?: number | null
           name?: string
