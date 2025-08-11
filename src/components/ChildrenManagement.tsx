@@ -23,6 +23,7 @@ interface Child {
   companion_name: string;
   islamic_level: number;
   login_password?: string;
+  login_email?: string;
 }
 
 interface ChildrenManagementProps {
@@ -50,15 +51,19 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
 
     setLoading(true);
 
-    // Generate unique credentials for the child
-    const childEmail = `${newChild.name.toLowerCase().replace(/\s+/g, '')}.${Date.now()}@qodwaa.com`;
+    // Generate unique credentials for the child with a simpler format
+    const timestamp = Date.now();
+    const childEmail = `${newChild.name.toLowerCase().replace(/\s+/g, '')}.child.${timestamp}@qodwaa.app`;
     const childPassword = `Qodwaa${Math.random().toString(36).substring(2, 8).toUpperCase()}!`;
+
+    console.log('Creating child with credentials:', { email: childEmail, password: childPassword });
 
     try {
       // Store current session to restore later
       const { data: { session: currentSession } } = await supabase.auth.getSession();
+      console.log('Current session before child creation:', currentSession?.user?.email);
       
-      // Create auth user for child (this will temporarily sign them in)
+      // Create auth user for child
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: childEmail,
         password: childPassword,
@@ -70,14 +75,21 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
         }
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error('Auth error:', authError);
+        throw authError;
+      }
+
+      console.log('Child auth user created:', authData.user?.email);
 
       // Immediately restore parent session to prevent child session from taking over
       if (currentSession) {
+        console.log('Restoring parent session...');
         await supabase.auth.setSession({
           access_token: currentSession.access_token,
           refresh_token: currentSession.refresh_token
         });
+        console.log('Parent session restored');
       }
 
       // Update user record with correct role and family_id (trigger creates basic record)
@@ -89,9 +101,12 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
         })
         .eq('id', authData.user?.id);
 
-      if (userError) throw userError;
+      if (userError) {
+        console.error('User update error:', userError);
+        throw userError;
+      }
 
-      // Create child profile
+      // Create child profile with stored credentials
       const { error: childError } = await supabase
         .from('children')
         .insert({
@@ -105,10 +120,14 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
           total_points: 0,
           current_streak: 0,
           islamic_level: 1,
-          login_password: childPassword
+          login_password: childPassword,
+          login_email: childEmail
         });
 
-      if (childError) throw childError;
+      if (childError) {
+        console.error('Child profile creation error:', childError);
+        throw childError;
+      }
 
       // Store credentials to display
       setCreatedCredentials({ email: childEmail, password: childPassword });
@@ -127,6 +146,7 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
       });
       onChildrenUpdate();
     } catch (error: any) {
+      console.error('Error creating child account:', error);
       toast({
         title: "Error",
         description: error.message,
@@ -181,8 +201,8 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
   };
 
   const getChildEmail = (child: Child) => {
-    // For existing children, generate email from name
-    return `${child.name.toLowerCase().replace(/\s+/g, '')}.child@qodwaa.com`;
+    // Return the stored email if available, otherwise generate from name
+    return child.login_email || `${child.name.toLowerCase().replace(/\s+/g, '')}.child@qodwaa.app`;
   };
 
   const getChildPassword = (child: Child) => {
