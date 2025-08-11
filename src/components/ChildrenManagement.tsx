@@ -231,7 +231,7 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
 
               <div className="space-y-2">
                 <Label htmlFor="gender">Gender</Label>
-                <Select onValueChange={(value) => setNewChild({...newChild, gender: value})} required>
+                <Select value={newChild.gender} onValueChange={(value) => setNewChild({...newChild, gender: value})} required>
                   <SelectTrigger>
                     <SelectValue placeholder="Select gender" />
                   </SelectTrigger>

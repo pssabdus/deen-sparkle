@@ -315,16 +315,21 @@ const RewardsManagement = ({ familyId }: RewardsManagementProps) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {rewards.map((reward) => (
-            <Card key={reward.id} className="hover:shadow-lg transition-shadow">
+            <Card key={reward.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => {}}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">{reward.icon}</div>
                     <div>
                       <CardTitle className="text-base">{reward.name}</CardTitle>
-                      <CardDescription className="capitalize">
-                        {reward.category}
-                      </CardDescription>
+                      <div className="flex items-center gap-2 mt-1">
+                        <CardDescription className="capitalize text-xs">
+                          {reward.category}
+                        </CardDescription>
+                        <Badge variant="outline" className="text-xs">
+                          All Children
+                        </Badge>
+                      </div>
                     </div>
                   </div>
                   <Badge className="bg-islamic-gold/20 text-islamic-gold">

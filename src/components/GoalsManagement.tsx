@@ -280,22 +280,32 @@ const GoalsManagement = ({ familyId }: GoalsManagementProps) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {goals.map((goal) => (
-            <Card key={goal.id} className="hover:shadow-lg transition-shadow">
+            <Card key={goal.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => {}}>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{goal.title}</CardTitle>
+                  <div>
+                    <CardTitle className="text-lg">{goal.title}</CardTitle>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="outline" className="text-xs">
+                        {children.find(c => c.id === goal.child_id)?.name || 'Unknown Child'}
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        {getGoalTypeLabel(goal.goal_type)}
+                      </Badge>
+                    </div>
+                  </div>
                   {goal.completed_at ? (
                     <Badge className="bg-islamic-green/20 text-islamic-green">
                       <Trophy className="w-3 h-3 mr-1" />
                       Completed
                     </Badge>
                   ) : (
-                    <Badge variant="secondary">
-                      {getGoalTypeLabel(goal.goal_type)}
+                    <Badge variant="outline" className="text-islamic-gold">
+                      Active
                     </Badge>
                   )}
                 </div>
-                <CardDescription>{goal.description}</CardDescription>
+                <CardDescription className="mt-2">{goal.description}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
