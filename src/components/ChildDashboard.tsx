@@ -17,6 +17,7 @@ import StreakTracker from '@/components/StreakTracker';
 import IslamicAIChat from '@/components/IslamicAIChat';
 import InteractiveIslamicCompanion from '@/components/InteractiveIslamicCompanion';
 import IslamicLearningGames from '@/components/IslamicLearningGames';
+import IslamicPrayerManager from '@/components/IslamicPrayerManager';
 
 interface UserProfile {
   id: string;
@@ -237,51 +238,11 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
           </TabsList>
 
           <TabsContent value="activities" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Prayer Tracker */}
-              <Card className="shadow-elegant">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-islamic-green">
-                    🕌 Prayer Time
-                  </CardTitle>
-                  <CardDescription>Track your daily prayers</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <PrayerTracker 
-                    childId={childProfile.id}
-                    prayers={todayPrayers}
-                    onPrayerUpdate={fetchTodayPrayers}
-                  />
-                </CardContent>
-              </Card>
-
-              {/* Quick Stats */}
-              <Card className="shadow-elegant">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-islamic-blue">
-                    📊 Today's Progress
-                  </CardTitle>
-                  <CardDescription>Your daily achievements</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Prayers Completed</span>
-                    <Badge variant="secondary">
-                      {todayPrayers.filter((p: any) => p.completed_at).length}/5
-                    </Badge>
-                  </div>
-                  <Progress 
-                    value={(todayPrayers.filter((p: any) => p.completed_at).length / 5) * 100} 
-                    className="h-2" 
-                  />
-                  <div className="text-center pt-2">
-                    <p className="text-sm text-muted-foreground">
-                      Keep going! You're doing amazing! 🌟
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            {/* Islamic Prayer Management System */}
+            <IslamicPrayerManager 
+              childId={childProfile.id}
+              userProfile={childProfile}
+            />
           </TabsContent>
 
           <TabsContent value="games">
