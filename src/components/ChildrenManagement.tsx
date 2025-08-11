@@ -55,7 +55,10 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
     const childPassword = `Qodwaa${Math.random().toString(36).substring(2, 8).toUpperCase()}!`;
 
     try {
-      // Create auth user for child
+      // Store current session to restore later
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      
+      // Create auth user for child (this will temporarily sign them in)
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: childEmail,
         password: childPassword,
@@ -98,6 +101,14 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
         });
 
       if (childError) throw childError;
+
+      // Restore parent session to keep them logged in
+      if (currentSession) {
+        await supabase.auth.setSession({
+          access_token: currentSession.access_token,
+          refresh_token: currentSession.refresh_token
+        });
+      }
 
       // Store credentials to display
       setCreatedCredentials({ email: childEmail, password: childPassword });
