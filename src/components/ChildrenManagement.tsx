@@ -8,8 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Plus, User, Calendar, Star, Flame, Eye, EyeOff, RefreshCw, Mail, Lock, Copy } from 'lucide-react';
+import { Plus, User, Calendar, Star, Flame, Eye, EyeOff, RefreshCw, Mail, Lock, Copy, Settings } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface Child {
   id: string;
@@ -44,6 +45,7 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
   });
   const [showCredentials, setShowCredentials] = useState<Record<string, boolean>>({});
   const [createdCredentials, setCreatedCredentials] = useState<{email: string, password: string} | null>(null);
+  const navigate = useNavigate();
 
   const handleCreateChild = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -222,14 +224,22 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Children Management</h2>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-islamic-green hover:bg-islamic-green/90">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Child
-            </Button>
-          </DialogTrigger>
+        <div>
+          <h2 className="text-2xl font-bold">Children Management</h2>
+          <p className="text-muted-foreground">Manage your children's profiles and activities</p>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={() => navigate('/setup')} className="bg-islamic-green hover:bg-islamic-green/90">
+            <Settings className="w-4 h-4 mr-2" />
+            Setup Wizard
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Plus className="w-4 h-4 mr-2" />
+                Quick Add
+              </Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add New Child</DialogTitle>
@@ -356,6 +366,7 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {children.length === 0 ? (
