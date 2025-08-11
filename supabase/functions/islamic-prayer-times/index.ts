@@ -53,11 +53,12 @@ function calculatePrayerTimes(lat: number, lng: number, date: Date, method: numb
   const month = date.getMonth() + 1;
   const day = date.getDate();
   
+  
   let a = Math.floor((14 - month) / 12);
-  let y = year - a;
+  let yearAdj = year - a;
   let m = month + 12 * a - 3;
   
-  const julianDay = day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) + 1721119;
+  const julianDay = day + Math.floor((153 * m + 2) / 5) + 365 * yearAdj + Math.floor(yearAdj / 4) - Math.floor(yearAdj / 100) + Math.floor(yearAdj / 400) + 1721119;
   
   // Calculate sun's position
   const n = julianDay - 2451545.0;
