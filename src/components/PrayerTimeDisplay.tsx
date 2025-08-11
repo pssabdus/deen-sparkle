@@ -144,6 +144,32 @@ const PrayerTimeDisplay: React.FC<PrayerTimeDisplayProps> = ({ childId, isParent
     getLocationAndPrayerTimes();
   }, [location, calculationMethod]);
 
+  // Initialize prayer times for children when prayer data is loaded
+  useEffect(() => {
+    const initializePrayers = async () => {
+      if (!childId || !prayerData) return;
+
+      try {
+        await supabase.functions.invoke('initialize-prayers', {
+          body: {
+            childId,
+            prayerTimes: {
+              fajr: prayerData.prayerTimes.fajr,
+              dhuhr: prayerData.prayerTimes.dhuhr,
+              asr: prayerData.prayerTimes.asr,
+              maghrib: prayerData.prayerTimes.maghrib,
+              isha: prayerData.prayerTimes.isha
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Error initializing prayers:', error);
+      }
+    };
+
+    initializePrayers();
+  }, [childId, prayerData]);
+
   // Load prayer status for child if provided
   useEffect(() => {
     const loadPrayerStatus = async () => {
@@ -179,21 +205,77 @@ const PrayerTimeDisplay: React.FC<PrayerTimeDisplayProps> = ({ childId, isParent
       const today = new Date().toISOString().split('T')[0];
       const now = new Date().toISOString();
 
-      const { error } = await supabase
+      // Calculate points (higher points for on-time prayers)
+      const basePoints = prayerName === 'Fajr' || prayerName === 'Isha' ? 20 : 15;
+      const bonusPoints = 5; // Bonus for completing prayer
+      const totalPoints = basePoints + bonusPoints;
+
+      // Update prayer completion
+      const { error: updateError } = await supabase
         .from('prayer_times')
-        .update({ completed_at: now })
+        .update({ 
+          completed_at: now,
+          points_earned: totalPoints,
+          on_time: true
+        })
         .eq('child_id', childId)
         .eq('prayer_name', prayerName)
         .eq('prayer_date', today);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
+      // Get current points and add new points
+      const { data: childData, error: fetchError } = await supabase
+        .from('children')
+        .select('total_points')
+        .eq('id', childId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      const currentPoints = childData?.total_points || 0;
+      const newTotalPoints = currentPoints + totalPoints;
+
+      // Update child's total points
+      const { error: pointsError } = await supabase
+        .from('children')
+        .update({ total_points: newTotalPoints })
+        .eq('id', childId);
+
+      // Create activity record
+      const { error: activityError } = await supabase
+        .from('activities')
+        .insert({
+          child_id: childId,
+          name: `${prayerName} Prayer`,
+          type: 'prayer',
+          description: `Completed ${prayerName} prayer on time`,
+          points_value: totalPoints,
+          completed_at: now,
+          metadata: {
+            prayer_name: prayerName,
+            prayer_date: today,
+            on_time: true
+          }
+        });
+
+      if (activityError) {
+        console.error('Error creating activity:', activityError);
+      }
+
+      // Update local state
       setPrayerStatus(prev => ({
         ...prev,
         [prayerName.toLowerCase()]: true
       }));
 
-      toast.success(`${prayerName} prayer marked as completed! 🤲`);
+      toast.success(`${prayerName} prayer completed! +${totalPoints} points 🤲✨`);
+      
+      // Reload prayer status to get updated data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+
     } catch (error) {
       console.error('Error marking prayer complete:', error);
       toast.error('Failed to update prayer status');
@@ -214,31 +296,57 @@ const PrayerTimeDisplay: React.FC<PrayerTimeDisplayProps> = ({ childId, isParent
       { name: 'Isha', time: prayerData.prayerTimes.isha }
     ];
 
+    // Find current prayer period
     for (let i = 0; i < prayers.length; i++) {
-      if (currentTimeStr < prayers[i].time) {
-        return prayers[i];
+      const currentPrayer = prayers[i];
+      const nextPrayer = prayers[i + 1] || prayers[0]; // Next day's Fajr if it's after Isha
+      
+      if (i === prayers.length - 1) {
+        // After Isha until midnight, then after midnight until Fajr
+        if (currentTimeStr >= currentPrayer.time || currentTimeStr < nextPrayer.time) {
+          return { current: currentPrayer, next: nextPrayer };
+        }
+      } else {
+        // Regular prayer periods
+        if (currentTimeStr >= currentPrayer.time && currentTimeStr < nextPrayer.time) {
+          return { current: currentPrayer, next: nextPrayer };
+        }
       }
     }
 
-    // If after Isha, next is Fajr
-    return prayers[0];
+    // Before Fajr (early morning)
+    return { current: null, next: prayers[0] };
   };
 
   const formatTimeUntilNext = (nextPrayerTime: string) => {
-    const now = currentTime;
-    const [hours, minutes] = nextPrayerTime.split(':').map(Number);
-    const nextPrayer = new Date(now);
-    nextPrayer.setHours(hours, minutes, 0, 0);
-
-    if (nextPrayer <= now) {
-      nextPrayer.setDate(nextPrayer.getDate() + 1);
+    if (!nextPrayerTime || !nextPrayerTime.includes(':')) {
+      return '0h 0m';
     }
+    
+    try {
+      const now = currentTime;
+      const [hours, minutes] = nextPrayerTime.split(':').map(Number);
+      
+      if (isNaN(hours) || isNaN(minutes)) {
+        return '0h 0m';
+      }
+      
+      const nextPrayer = new Date(now);
+      nextPrayer.setHours(hours, minutes, 0, 0);
 
-    const diff = nextPrayer.getTime() - now.getTime();
-    const hoursUntil = Math.floor(diff / (1000 * 60 * 60));
-    const minutesUntil = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      if (nextPrayer <= now) {
+        nextPrayer.setDate(nextPrayer.getDate() + 1);
+      }
 
-    return `${hoursUntil}h ${minutesUntil}m`;
+      const diff = nextPrayer.getTime() - now.getTime();
+      const hoursUntil = Math.floor(diff / (1000 * 60 * 60));
+      const minutesUntil = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+      return `${hoursUntil}h ${minutesUntil}m`;
+    } catch (error) {
+      console.error('Error calculating time until next prayer:', error);
+      return '0h 0m';
+    }
   };
 
   const getPrayerIcon = (prayerName: string) => {
@@ -299,7 +407,7 @@ const PrayerTimeDisplay: React.FC<PrayerTimeDisplayProps> = ({ childId, isParent
     );
   }
 
-  const nextPrayer = getCurrentPrayer();
+  const prayerInfo = getCurrentPrayer();
   const completedPrayers = Object.values(prayerStatus).filter(Boolean).length;
   const totalPrayers = 5;
   const completionPercentage = (completedPrayers / totalPrayers) * 100;
@@ -329,13 +437,20 @@ const PrayerTimeDisplay: React.FC<PrayerTimeDisplayProps> = ({ childId, isParent
               )}
             </div>
             <div className="text-right">
-              {nextPrayer && (
+              {prayerInfo?.current && (
+                <div className="mb-2">
+                  <Badge className="bg-islamic-green">
+                    Current: {prayerInfo.current.name}
+                  </Badge>
+                </div>
+              )}
+              {prayerInfo?.next && (
                 <div>
                   <Badge variant="outline" className="mb-2">
-                    Next: {nextPrayer.name} in {formatTimeUntilNext(nextPrayer.time)}
+                    Next: {prayerInfo.next.name} in {formatTimeUntilNext(prayerInfo.next.time)}
                   </Badge>
                   <div className="text-lg font-semibold text-islamic-green">
-                    {nextPrayer.time}
+                    {prayerInfo.next.time}
                   </div>
                 </div>
               )}
@@ -391,7 +506,7 @@ const PrayerTimeDisplay: React.FC<PrayerTimeDisplayProps> = ({ childId, isParent
               const timeKey = prayer.key as keyof typeof prayerData.prayerTimes;
               const time = prayerData.prayerTimes[timeKey];
               const isCompleted = prayerStatus[prayer.key] || false;
-              const isNext = nextPrayer?.name.toLowerCase() === prayer.key;
+              const isNext = prayerInfo?.next?.name.toLowerCase() === prayer.key;
               
               return (
                 <div 
