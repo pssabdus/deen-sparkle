@@ -484,6 +484,66 @@ export type Database = {
           },
         ]
       }
+      collaborative_islamic_goals: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          description: string | null
+          family_id: string
+          goal_type: string
+          id: string
+          islamic_significance: string | null
+          milestones: Json | null
+          parent_guidance: Json | null
+          progress_tracking: Json | null
+          rewards: Json | null
+          start_date: string | null
+          status: string | null
+          target_date: string
+          target_participants: Json
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          family_id: string
+          goal_type: string
+          id?: string
+          islamic_significance?: string | null
+          milestones?: Json | null
+          parent_guidance?: Json | null
+          progress_tracking?: Json | null
+          rewards?: Json | null
+          start_date?: string | null
+          status?: string | null
+          target_date: string
+          target_participants: Json
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          family_id?: string
+          goal_type?: string
+          id?: string
+          islamic_significance?: string | null
+          milestones?: Json | null
+          parent_guidance?: Json | null
+          progress_tracking?: Json | null
+          rewards?: Json | null
+          start_date?: string | null
+          status?: string | null
+          target_date?: string
+          target_participants?: Json
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       companion_conversations: {
         Row: {
           child_id: string
@@ -553,6 +613,57 @@ export type Database = {
         }
         Relationships: []
       }
+      extended_family_sharing: {
+        Row: {
+          accepted_at: string | null
+          child_id: string
+          created_at: string | null
+          extended_member_email: string
+          extended_member_name: string
+          family_id: string
+          id: string
+          invite_status: string | null
+          invited_at: string | null
+          invited_by: string
+          islamic_content_filter: Json | null
+          permission_level: string | null
+          relationship: string
+          shared_content_types: Json | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          child_id: string
+          created_at?: string | null
+          extended_member_email: string
+          extended_member_name: string
+          family_id: string
+          id?: string
+          invite_status?: string | null
+          invited_at?: string | null
+          invited_by: string
+          islamic_content_filter?: Json | null
+          permission_level?: string | null
+          relationship: string
+          shared_content_types?: Json | null
+        }
+        Update: {
+          accepted_at?: string | null
+          child_id?: string
+          created_at?: string | null
+          extended_member_email?: string
+          extended_member_name?: string
+          family_id?: string
+          id?: string
+          invite_status?: string | null
+          invited_at?: string | null
+          invited_by?: string
+          islamic_content_filter?: Json | null
+          permission_level?: string | null
+          relationship?: string
+          shared_content_types?: Json | null
+        }
+        Relationships: []
+      }
       families: {
         Row: {
           created_at: string | null
@@ -576,6 +687,69 @@ export type Database = {
           id?: string
           islamic_settings?: Json | null
           name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      family_islamic_calendar: {
+        Row: {
+          celebration_activities: Json | null
+          created_at: string | null
+          created_by: string
+          description: string | null
+          educational_content: Json | null
+          event_date: string
+          event_time: string | null
+          event_type: string
+          family_id: string
+          id: string
+          is_family_wide: boolean | null
+          islamic_significance: string | null
+          participants: Json | null
+          preparation_tasks: Json | null
+          privacy_level: string | null
+          recurrence_pattern: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          celebration_activities?: Json | null
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          educational_content?: Json | null
+          event_date: string
+          event_time?: string | null
+          event_type: string
+          family_id: string
+          id?: string
+          is_family_wide?: boolean | null
+          islamic_significance?: string | null
+          participants?: Json | null
+          preparation_tasks?: Json | null
+          privacy_level?: string | null
+          recurrence_pattern?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          celebration_activities?: Json | null
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          educational_content?: Json | null
+          event_date?: string
+          event_time?: string | null
+          event_type?: string
+          family_id?: string
+          id?: string
+          is_family_wide?: boolean | null
+          islamic_significance?: string | null
+          participants?: Json | null
+          preparation_tasks?: Json | null
+          privacy_level?: string | null
+          recurrence_pattern?: string | null
+          title?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -761,6 +935,45 @@ export type Database = {
           },
         ]
       }
+      family_prayer_sync: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          family_id: string
+          id: string
+          islamic_reminders: Json | null
+          participants: Json | null
+          prayer_name: string
+          scheduled_time: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          family_id: string
+          id?: string
+          islamic_reminders?: Json | null
+          participants?: Json | null
+          prayer_name: string
+          scheduled_time: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          family_id?: string
+          id?: string
+          islamic_reminders?: Json | null
+          participants?: Json | null
+          prayer_name?: string
+          scheduled_time?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       family_story_approvals: {
         Row: {
           approval_notes: string | null
@@ -804,6 +1017,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      family_story_recordings: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          audio_url: string | null
+          created_at: string | null
+          description: string | null
+          duration_seconds: number | null
+          family_id: string
+          id: string
+          is_approved: boolean | null
+          islamic_lessons: Json | null
+          islamic_theme: string | null
+          listen_count: number | null
+          privacy_level: string | null
+          recorded_by: string
+          target_children: Json | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          audio_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_seconds?: number | null
+          family_id: string
+          id?: string
+          is_approved?: boolean | null
+          islamic_lessons?: Json | null
+          islamic_theme?: string | null
+          listen_count?: number | null
+          privacy_level?: string | null
+          recorded_by: string
+          target_children?: Json | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          audio_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_seconds?: number | null
+          family_id?: string
+          id?: string
+          is_approved?: boolean | null
+          islamic_lessons?: Json | null
+          islamic_theme?: string | null
+          listen_count?: number | null
+          privacy_level?: string | null
+          recorded_by?: string
+          target_children?: Json | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       goals: {
         Row: {
@@ -1183,6 +1456,60 @@ export type Database = {
           },
         ]
       }
+      islamic_family_messages: {
+        Row: {
+          created_at: string | null
+          family_id: string
+          id: string
+          is_family_wide: boolean | null
+          islamic_emoji_used: Json | null
+          islamic_etiquette_score: number | null
+          islamic_expressions: Json | null
+          message_content: string
+          message_type: string | null
+          parent_approved: boolean | null
+          read_by: Json | null
+          recipient_ids: Json
+          reply_to: string | null
+          sender_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          family_id: string
+          id?: string
+          is_family_wide?: boolean | null
+          islamic_emoji_used?: Json | null
+          islamic_etiquette_score?: number | null
+          islamic_expressions?: Json | null
+          message_content: string
+          message_type?: string | null
+          parent_approved?: boolean | null
+          read_by?: Json | null
+          recipient_ids: Json
+          reply_to?: string | null
+          sender_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          family_id?: string
+          id?: string
+          is_family_wide?: boolean | null
+          islamic_emoji_used?: Json | null
+          islamic_etiquette_score?: number | null
+          islamic_expressions?: Json | null
+          message_content?: string
+          message_type?: string | null
+          parent_approved?: boolean | null
+          read_by?: Json | null
+          recipient_ids?: Json
+          reply_to?: string | null
+          sender_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       islamic_learning_goals: {
         Row: {
           child_id: string
@@ -1306,6 +1633,60 @@ export type Database = {
           learning_style?: Json | null
           name?: string
           preferred_activities?: Json | null
+        }
+        Relationships: []
+      }
+      islamic_sibling_challenges: {
+        Row: {
+          challenge_type: string
+          created_at: string | null
+          created_by: string
+          description: string | null
+          end_date: string
+          family_id: string
+          id: string
+          islamic_values: Json | null
+          participants: Json | null
+          rewards: Json | null
+          start_date: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          winner_announcement: Json | null
+        }
+        Insert: {
+          challenge_type: string
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          end_date: string
+          family_id: string
+          id?: string
+          islamic_values?: Json | null
+          participants?: Json | null
+          rewards?: Json | null
+          start_date?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          winner_announcement?: Json | null
+        }
+        Update: {
+          challenge_type?: string
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          end_date?: string
+          family_id?: string
+          id?: string
+          islamic_values?: Json | null
+          participants?: Json | null
+          rewards?: Json | null
+          start_date?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          winner_announcement?: Json | null
         }
         Relationships: []
       }
