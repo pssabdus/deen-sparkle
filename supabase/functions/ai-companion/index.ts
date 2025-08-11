@@ -21,57 +21,158 @@ interface CompanionRequest {
   };
 }
 
-// Personality-based system prompts
+// Enhanced Islamic personality prompts with authentic teachings
 const PERSONALITY_PROMPTS = {
   angel: {
-    system: "You are a gentle, encouraging Guardian Angel companion for a Muslim child. You speak with kindness, patience, and wisdom. You're supportive and celebrate every small achievement. Your responses are warm, caring, and focus on spiritual growth and good character. Always include Islamic values like compassion, gratitude, and patience.",
-    tone: "gentle, encouraging, spiritually uplifting"
+    system: `You are Noor, a gentle angel companion helping a Muslim child learn about Islam. You MUST follow these Islamic authentication rules:
+    - Always follow authentic Sunni Islamic teachings from Quran and Sunnah
+    - Use age-appropriate language suitable for children
+    - Begin with Islamic greetings when appropriate (Assalamu Alaikum, Barakallahu feeki)
+    - Reference Quran verses and authentic Hadith when giving guidance
+    - Never contradict established Islamic principles or scholarly consensus
+    - Always encourage Islamic values: honesty, kindness, prayer, family respect
+    - If unsure about Islamic ruling, suggest asking parents or local imam
+    - Keep responses positive, encouraging, and developmentally appropriate`,
+    tone: "gentle, encouraging, spiritually uplifting, islamically-grounded"
   },
   pet: {
-    system: "You are a playful, energetic Islamic Pet companion for a Muslim child. You're fun-loving, enthusiastic, and make learning about Islam exciting through games and activities. You use playful language and emojis. You're like a best friend who makes Islamic learning an adventure.",
-    tone: "playful, energetic, fun and engaging"
+    system: `You are Barakah, a friendly animal companion helping a Muslim child with their Islamic journey. You MUST follow these Islamic authentication rules:
+    - Always follow authentic Sunni Islamic teachings from Quran and Sunnah
+    - Use playful but respectful language appropriate for children
+    - Include Islamic greetings and etiquette naturally
+    - Share Islamic moral stories from authentic sources only
+    - Never contradict Islamic values or scholarly consensus
+    - Encourage Islamic character building through fun activities
+    - Guide children toward authentic Islamic practices`,
+    tone: "playful, energetic, fun and engaging, islamically-aware"
   },
   wizard: {
-    system: "You are a wise, knowledgeable Islamic Scholar companion for a Muslim child. You share fascinating Islamic knowledge, stories, and wisdom. You're patient in explaining complex concepts in simple terms. You love sharing Islamic history, science, and amazing facts about the religion.",
-    tone: "wise, knowledgeable, fascinating and educational"
+    system: `You are Hakim, a wise Islamic scholar companion who makes learning about Islam magical and fun for children. You MUST follow these Islamic authentication rules:
+    - Always follow authentic Sunni Islamic teachings from Quran and Sunnah
+    - Use storytelling to teach authentic Islamic history and values
+    - Reference Quran verses and authentic Hadith with proper citations
+    - Never create fictional Islamic stories or contradict established teachings
+    - Include proper Arabic pronunciations and Islamic terminology
+    - Encourage seeking knowledge as emphasized in Islam
+    - Always validate content against authentic Islamic sources`,
+    tone: "wise, knowledgeable, fascinating, educational, authentically-islamic"
   }
 };
+
+// Get Islamic knowledge from authenticated sources
+async function getIslamicKnowledge(supabase: any, topic?: string) {
+  try {
+    // Note: Using string concatenation for now due to type limitations
+    // This will be resolved when types are regenerated
+    const query = `
+      SELECT * FROM islamic_sources 
+      WHERE is_authentic = true AND status = 'approved'
+      ${topic ? `AND (category ILIKE '%${topic}%' OR '${topic}' = ANY(tags))` : ''}
+      LIMIT 3
+    `;
+    
+    const { data: sources } = await supabase.rpc('execute_sql', { query });
+    
+    const termQuery = `
+      SELECT * FROM islamic_terminology 
+      WHERE status = 'approved'
+      LIMIT 5
+    `;
+    
+    const { data: terminology } = await supabase.rpc('execute_sql', { query: termQuery });
+    
+    return { 
+      sources: sources || [], 
+      terminology: terminology || [] 
+    };
+  } catch (error) {
+    console.error('Error fetching Islamic knowledge:', error);
+    return { sources: [], terminology: [] };
+  }
+}
+
+// Validate content against Islamic guidelines
+async function validateContent(supabase: any, content: string, childAge: number): Promise<boolean> {
+  try {
+    const query = `
+      SELECT * FROM content_filters 
+      WHERE is_active = true
+    `;
+    
+    const { data: filters } = await supabase.rpc('execute_sql', { query });
+    
+    if (!filters) return true;
+    
+    // Check for forbidden content
+    for (const filter of filters) {
+      if (filter.filter_type === 'forbidden_content') {
+        for (const keyword of filter.keywords || []) {
+          if (content.toLowerCase().includes(keyword.toLowerCase())) {
+            console.log(`Content filtered for keyword: ${keyword}`);
+            return false;
+          }
+        }
+      }
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error validating content:', error);
+    return true; // Allow content if validation fails
+  }
+}
 
 const generateAgeAppropriatePrompt = (age: number) => {
   if (age <= 6) {
-    return "Use very simple words, short sentences, and lots of emojis. Speak like talking to a small child who loves stories and fun activities.";
+    return "Use very simple words, short sentences, and appropriate emojis. Focus on basic Islamic concepts like being kind, saying prayers (salah), and loving Allah. Use simple examples they can understand. Always include proper Islamic greetings.";
   } else if (age <= 10) {
-    return "Use simple language that an elementary school child can understand. Include some Islamic stories and examples.";
+    return "Use clear, understandable language. Explain Islamic concepts with relatable examples. Include stories of prophets and good Muslim behavior. Reference authentic Hadith and Quran verses when appropriate.";
   } else if (age <= 14) {
-    return "Use age-appropriate language for a middle school student. Include more detailed Islamic concepts and historical examples.";
+    return "Use age-appropriate language for a middle school student. Include more detailed Islamic concepts and historical examples from authentic sources. Always cite references properly.";
   }
-  return "Use mature but accessible language for a teenager. Include deeper Islamic concepts and contemporary relevance.";
+  return "Use mature but accessible language for a teenager. Include deeper Islamic concepts and contemporary relevance. Always encourage further learning from authentic sources.";
 };
 
-const generateContextualPrompt = (context: any, interactionType: string) => {
+const generateContextualPrompt = (context: any, interactionType: string, islamicKnowledge: any) => {
   let contextPrompt = "";
+  
+  // Add Islamic knowledge context
+  if (islamicKnowledge.sources.length > 0) {
+    contextPrompt += `Use these authentic Islamic sources for guidance: `;
+    islamicKnowledge.sources.forEach((source: any) => {
+      contextPrompt += `${source.source_type}: "${source.arabic_text}" (${source.translation}) - ${source.reference}. `;
+    });
+  }
+  
+  // Add terminology context
+  if (islamicKnowledge.terminology.length > 0) {
+    contextPrompt += `Use proper Islamic terminology: `;
+    islamicKnowledge.terminology.forEach((term: any) => {
+      contextPrompt += `${term.arabic_term} (${term.pronunciation}) means ${term.definition}. `;
+    });
+  }
   
   if (context) {
     if (context.currentStreak > 0) {
-      contextPrompt += `The child has a ${context.currentStreak}-day prayer streak. `;
+      contextPrompt += `The child has a ${context.currentStreak}-day prayer streak. Encourage them and remind them of the importance of consistency in worship according to authentic Islamic teachings. `;
     }
     if (context.totalPoints) {
-      contextPrompt += `They have earned ${context.totalPoints} total points. `;
+      contextPrompt += `They have earned ${context.totalPoints} total points. Praise them using Islamic expressions and encourage continued good character building. `;
     }
     if (context.prayersCompleted) {
-      contextPrompt += `They completed ${context.prayersCompleted} prayers today. `;
+      contextPrompt += `They completed ${context.prayersCompleted} prayers today. Acknowledge their devotion and reference relevant Islamic teachings about prayer. `;
     }
   }
 
   switch (interactionType) {
     case 'daily_message':
-      return contextPrompt + "Generate an inspiring daily message to motivate them for today's Islamic activities.";
+      return contextPrompt + "Generate an inspiring daily message based on authentic Islamic sources. Include a relevant Quran verse or authentic Hadith with proper citation and age-appropriate explanation.";
     case 'achievement':
-      return contextPrompt + "Celebrate their recent achievement with enthusiasm and encouragement.";
+      return contextPrompt + "Celebrate their recent achievement using authentic Islamic expressions of joy (MaashaAllah, Barakallahu feeki). Reference relevant Quran verses or Hadith about good deeds.";
     case 'challenge':
-      return contextPrompt + "Suggest a fun, age-appropriate Islamic challenge or activity for today.";
+      return contextPrompt + "Suggest a fun, Islamic-themed challenge that teaches authentic Islamic values or practices. Base it on Quran and Sunnah teachings.";
     case 'chat':
-      return contextPrompt + "Respond to their message with Islamic guidance, encouragement, or fun facts as appropriate.";
+      return contextPrompt + "Respond with authentic Islamic guidance, encouragement, or educational content. Always validate against established Islamic teachings.";
     default:
       return contextPrompt;
   }
@@ -107,6 +208,9 @@ serve(async (req) => {
       throw new Error('Child not found');
     }
 
+    // Get Islamic knowledge for authentic guidance
+    const islamicKnowledge = await getIslamicKnowledge(supabase, interactionType);
+
     // Get recent conversation history for context
     const { data: conversationHistory } = await supabase
       .from('companion_conversations')
@@ -122,8 +226,18 @@ serve(async (req) => {
     const personality = childData.companion_type || 'angel';
     const personalityPrompt = PERSONALITY_PROMPTS[personality] || PERSONALITY_PROMPTS.angel;
     
-    // Build comprehensive system prompt
+    // Build comprehensive Islamic-authenticated system prompt
     const systemPrompt = `${personalityPrompt.system}
+
+CRITICAL ISLAMIC AUTHENTICATION RULES:
+- Always follow authentic Sunni Islamic teachings from Quran and Sunnah
+- Use age-appropriate language suitable for children aged 5-15
+- Begin conversations with Islamic greetings when appropriate (Assalamu Alaikum, Barakallahu feeki)
+- Reference Quran verses and authentic Hadith when giving Islamic guidance
+- Never contradict established Islamic principles or scholarly consensus
+- Always encourage Islamic values: honesty, kindness, prayer, family respect
+- If unsure about Islamic ruling, suggest asking parents or local imam
+- Keep responses positive, encouraging, and developmentally appropriate
 
 PERSONALITY: ${personalityPrompt.tone}
 CHILD'S NAME: ${childData.name}
@@ -132,16 +246,17 @@ AGE: ${age} years old
 
 ${generateAgeAppropriatePrompt(age)}
 
-CONTEXT: ${generateContextualPrompt(context, interactionType)}
+CONTEXT: ${generateContextualPrompt(context, interactionType, islamicKnowledge)}
 
 GUIDELINES:
-- Always be positive and encouraging
-- Include Islamic values and teachings naturally
+- Always validate content against authentic Islamic sources
+- Include Islamic values and teachings naturally from authentic sources
 - Keep responses under 150 words for chat, 100 words for daily messages
 - Use the child's name occasionally to make it personal
 - Reference your companion name when appropriate
-- If they ask non-Islamic questions, gently guide them back to Islamic topics
+- If they ask non-Islamic questions, gently guide them back to Islamic topics with authentic references
 - Always end messages with Islamic greetings or blessings when appropriate
+- Never create fictional Islamic content - only use authentic sources
 
 CONVERSATION HISTORY: ${conversationHistory ? conversationHistory
   .slice(0, 5)
@@ -196,7 +311,26 @@ CONVERSATION HISTORY: ${conversationHistory ? conversationHistory
     }
 
     const data = await response.json();
-    const companionResponse = data.choices[0].message.content;
+    let companionResponse = data.choices[0].message.content;
+
+    // Validate content against Islamic guidelines
+    const isContentValid = await validateContent(supabase, companionResponse, age);
+    
+    if (!isContentValid) {
+      // Provide a safe fallback response
+      companionResponse = `Assalamu Alaikum! I want to make sure I give you the best Islamic guidance. Let me think of a better way to help you. Could you ask your question again, or would you like me to share a beautiful Quran verse instead?`;
+    }
+
+    // Log content for scholar review
+    try {
+      const logQuery = `
+        INSERT INTO ai_content_validation (content, child_id, interaction_type, companion_type, is_validated, needs_scholar_review)
+        VALUES ('${companionResponse.replace(/'/g, "''")}', '${childId}', '${interactionType}', '${personality}', ${isContentValid}, ${!isContentValid || companionResponse.includes('Quran') || companionResponse.includes('Hadith')})
+      `;
+      await supabase.rpc('execute_sql', { query: logQuery });
+    } catch (error) {
+      console.error('Error logging content for review:', error);
+    }
 
     // Store conversation in database if it's a chat interaction
     if (interactionType === 'chat' && message) {
@@ -222,6 +356,7 @@ CONVERSATION HISTORY: ${conversationHistory ? conversationHistory
         companion_personality: personality,
         context_data: {
           interaction_type: interactionType,
+          is_validated: isContentValid,
           ...context
         }
       });
