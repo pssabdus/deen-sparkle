@@ -277,7 +277,11 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
                 <CardDescription>Read beautiful Islamic stories and learn</CardDescription>
               </CardHeader>
               <CardContent>
-                <StoryReader childId={childProfile.id} />
+                <StoryReader 
+                  childId={childProfile.id} 
+                  userRole="child"
+                  familyId={childProfile.family_id}
+                />
               </CardContent>
             </Card>
           </TabsContent>
