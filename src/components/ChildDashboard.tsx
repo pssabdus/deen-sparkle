@@ -17,6 +17,7 @@ import IslamicAIChat from '@/components/IslamicAIChat';
 import InteractiveIslamicCompanion from '@/components/InteractiveIslamicCompanion';
 import IslamicLearningGames from '@/components/IslamicLearningGames';
 import IslamicPrayerManager from '@/components/IslamicPrayerManager';
+import IslamicMotivationSystem from '@/components/IslamicMotivationSystem';
 
 interface UserProfile {
   id: string;
@@ -220,7 +221,7 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="activities" className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="activities">Activities</TabsTrigger>
             <TabsTrigger value="games">
               <Gamepad2 className="w-4 h-4 mr-1" />
@@ -230,6 +231,10 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
             <TabsTrigger value="streaks">Streaks</TabsTrigger>
             <TabsTrigger value="stories">Stories</TabsTrigger>
             <TabsTrigger value="rewards">Rewards</TabsTrigger>
+            <TabsTrigger value="motivation">
+              <Heart className="w-4 h-4 mr-1" />
+              Motivation
+            </TabsTrigger>
             <TabsTrigger value="ai-chat">
               <MessageCircle className="w-4 h-4 mr-1" />
               Ask AI
@@ -299,6 +304,14 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
             </Card>
           </TabsContent>
           
+          <TabsContent value="motivation">
+            <IslamicMotivationSystem 
+              childId={childProfile.id}
+              familyId={childProfile.family_id}
+              userRole="child"
+            />
+          </TabsContent>
+
           <TabsContent value="ai-chat">
             <IslamicAIChat userRole="child" childAge={childProfile.islamic_level} />
           </TabsContent>
