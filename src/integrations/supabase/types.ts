@@ -448,6 +448,50 @@ export type Database = {
           },
         ]
       }
+      family_story_approvals: {
+        Row: {
+          approval_notes: string | null
+          approval_status: string
+          approved_by: string
+          child_restrictions: Json | null
+          created_at: string
+          family_id: string
+          id: string
+          story_id: string
+          updated_at: string
+        }
+        Insert: {
+          approval_notes?: string | null
+          approval_status?: string
+          approved_by: string
+          child_restrictions?: Json | null
+          created_at?: string
+          family_id: string
+          id?: string
+          story_id: string
+          updated_at?: string
+        }
+        Update: {
+          approval_notes?: string | null
+          approval_status?: string
+          approved_by?: string
+          child_restrictions?: Json | null
+          created_at?: string
+          family_id?: string
+          id?: string
+          story_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_story_approvals_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       goals: {
         Row: {
           child_id: string
@@ -517,6 +561,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      islamic_educators: {
+        Row: {
+          approval_level: string | null
+          contact_email: string | null
+          created_at: string
+          credentials: string
+          id: string
+          is_active: boolean | null
+          name: string
+          specialization: Json | null
+          updated_at: string
+          user_id: string
+          verification_status: string | null
+        }
+        Insert: {
+          approval_level?: string | null
+          contact_email?: string | null
+          created_at?: string
+          credentials: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          specialization?: Json | null
+          updated_at?: string
+          user_id: string
+          verification_status?: string | null
+        }
+        Update: {
+          approval_level?: string | null
+          contact_email?: string | null
+          created_at?: string
+          credentials?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          specialization?: Json | null
+          updated_at?: string
+          user_id?: string
+          verification_status?: string | null
+        }
+        Relationships: []
       }
       islamic_learning_goals: {
         Row: {
@@ -593,6 +679,51 @@ export type Database = {
           learning_style?: Json | null
           name?: string
           preferred_activities?: Json | null
+        }
+        Relationships: []
+      }
+      islamic_story_prompts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          difficulty_level: string | null
+          id: string
+          islamic_concepts: Json | null
+          islamic_source: string | null
+          main_characters: Json | null
+          moral_lessons: Json | null
+          prompt_text: string
+          status: string | null
+          target_age_group: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          difficulty_level?: string | null
+          id?: string
+          islamic_concepts?: Json | null
+          islamic_source?: string | null
+          main_characters?: Json | null
+          moral_lessons?: Json | null
+          prompt_text: string
+          status?: string | null
+          target_age_group: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          difficulty_level?: string | null
+          id?: string
+          islamic_concepts?: Json | null
+          islamic_source?: string | null
+          main_characters?: Json | null
+          moral_lessons?: Json | null
+          prompt_text?: string
+          status?: string | null
+          target_age_group?: string
+          title?: string
         }
         Relationships: []
       }
@@ -908,16 +1039,25 @@ export type Database = {
           age_group: string
           audio_url: string | null
           category: string | null
+          characters: Json | null
           content: string
           created_at: string | null
           created_by: string | null
+          difficulty_level: string | null
           id: string
+          illustration_guidelines: string | null
           image_url: string | null
+          islamic_lessons: Json | null
+          islamic_source: string | null
+          islamic_terminology: Json | null
           moral: string | null
           published_at: string | null
           reading_time: number | null
           scheduled_for: string | null
+          scholar_notes: string | null
           status: string
+          target_age_max: number | null
+          target_age_min: number | null
           title: string
           updated_at: string | null
         }
@@ -925,16 +1065,25 @@ export type Database = {
           age_group?: string
           audio_url?: string | null
           category?: string | null
+          characters?: Json | null
           content: string
           created_at?: string | null
           created_by?: string | null
+          difficulty_level?: string | null
           id?: string
+          illustration_guidelines?: string | null
           image_url?: string | null
+          islamic_lessons?: Json | null
+          islamic_source?: string | null
+          islamic_terminology?: Json | null
           moral?: string | null
           published_at?: string | null
           reading_time?: number | null
           scheduled_for?: string | null
+          scholar_notes?: string | null
           status?: string
+          target_age_max?: number | null
+          target_age_min?: number | null
           title: string
           updated_at?: string | null
         }
@@ -942,16 +1091,25 @@ export type Database = {
           age_group?: string
           audio_url?: string | null
           category?: string | null
+          characters?: Json | null
           content?: string
           created_at?: string | null
           created_by?: string | null
+          difficulty_level?: string | null
           id?: string
+          illustration_guidelines?: string | null
           image_url?: string | null
+          islamic_lessons?: Json | null
+          islamic_source?: string | null
+          islamic_terminology?: Json | null
           moral?: string | null
           published_at?: string | null
           reading_time?: number | null
           scheduled_for?: string | null
+          scholar_notes?: string | null
           status?: string
+          target_age_max?: number | null
+          target_age_min?: number | null
           title?: string
           updated_at?: string | null
         }
@@ -961,6 +1119,59 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      story_generation_requests: {
+        Row: {
+          age_range: string
+          child_id: string | null
+          created_at: string
+          family_id: string
+          generated_story_id: string | null
+          id: string
+          islamic_focus: Json | null
+          request_status: string | null
+          requested_by: string
+          specific_requests: string | null
+          story_theme: string
+          updated_at: string
+        }
+        Insert: {
+          age_range: string
+          child_id?: string | null
+          created_at?: string
+          family_id: string
+          generated_story_id?: string | null
+          id?: string
+          islamic_focus?: Json | null
+          request_status?: string | null
+          requested_by: string
+          specific_requests?: string | null
+          story_theme: string
+          updated_at?: string
+        }
+        Update: {
+          age_range?: string
+          child_id?: string | null
+          created_at?: string
+          family_id?: string
+          generated_story_id?: string | null
+          id?: string
+          islamic_focus?: Json | null
+          request_status?: string | null
+          requested_by?: string
+          specific_requests?: string | null
+          story_theme?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_generation_requests_generated_story_id_fkey"
+            columns: ["generated_story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
             referencedColumns: ["id"]
           },
         ]
@@ -1007,6 +1218,56 @@ export type Database = {
           },
           {
             foreignKeyName: "story_progress_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      story_reviews: {
+        Row: {
+          age_appropriateness_score: number | null
+          created_at: string
+          educational_value_score: number | null
+          id: string
+          islamic_authenticity_score: number | null
+          review_notes: string | null
+          review_status: string
+          reviewer_id: string
+          reviewer_type: string
+          story_id: string
+          updated_at: string
+        }
+        Insert: {
+          age_appropriateness_score?: number | null
+          created_at?: string
+          educational_value_score?: number | null
+          id?: string
+          islamic_authenticity_score?: number | null
+          review_notes?: string | null
+          review_status?: string
+          reviewer_id: string
+          reviewer_type: string
+          story_id: string
+          updated_at?: string
+        }
+        Update: {
+          age_appropriateness_score?: number | null
+          created_at?: string
+          educational_value_score?: number | null
+          id?: string
+          islamic_authenticity_score?: number | null
+          review_notes?: string | null
+          review_status?: string
+          reviewer_id?: string
+          reviewer_type?: string
+          story_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_reviews_story_id_fkey"
             columns: ["story_id"]
             isOneToOne: false
             referencedRelation: "stories"
@@ -1114,12 +1375,20 @@ export type Database = {
         Args: { gregorian_date?: string }
         Returns: Json
       }
+      get_story_review_summary: {
+        Args: { story_uuid: string }
+        Returns: Json
+      }
       get_user_family_id: {
         Args: { user_id: string }
         Returns: string
       }
       is_parent: {
         Args: { user_id: string }
+        Returns: boolean
+      }
+      is_story_approved_for_family: {
+        Args: { story_uuid: string; family_uuid: string }
         Returns: boolean
       }
       update_child_points: {
