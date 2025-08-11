@@ -15,6 +15,7 @@ import BadgeSystem from '@/components/BadgeSystem';
 import IslamicCompanion from '@/components/IslamicCompanion';
 import StreakTracker from '@/components/StreakTracker';
 import IslamicAIChat from '@/components/IslamicAIChat';
+import InteractiveIslamicCompanion from '@/components/InteractiveIslamicCompanion';
 
 interface UserProfile {
   id: string;
@@ -194,9 +195,9 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
           </Card>
         </div>
 
-        {/* Islamic Companion */}
+        {/* Interactive AI Companion */}
         <div className="mb-6">
-          <IslamicCompanion 
+          <InteractiveIslamicCompanion 
             companion={{
               type: childProfile.companion_type as 'angel' | 'pet' | 'wizard',
               name: childProfile.companion_name,
@@ -205,9 +206,14 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
               happiness: 85,
               energy: 90
             }}
+            childId={childProfile.id}
             childName={childProfile.name}
+            recentActivity={[]}
             points={childProfile.total_points}
             streak={childProfile.current_streak}
+            onInteract={(action) => {
+              console.log('Companion interaction:', action);
+            }}
           />
         </div>
 

@@ -271,6 +271,75 @@ export type Database = {
           },
         ]
       }
+      companion_conversations: {
+        Row: {
+          child_id: string
+          companion_personality: string
+          context_data: Json | null
+          created_at: string
+          id: string
+          message_content: string
+          message_type: string
+          updated_at: string
+        }
+        Insert: {
+          child_id: string
+          companion_personality?: string
+          context_data?: Json | null
+          created_at?: string
+          id?: string
+          message_content: string
+          message_type: string
+          updated_at?: string
+        }
+        Update: {
+          child_id?: string
+          companion_personality?: string
+          context_data?: Json | null
+          created_at?: string
+          id?: string
+          message_content?: string
+          message_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      companion_daily_content: {
+        Row: {
+          child_id: string
+          content_data: Json | null
+          content_text: string
+          content_title: string | null
+          content_type: string
+          created_at: string
+          date_created: string
+          id: string
+          is_delivered: boolean | null
+        }
+        Insert: {
+          child_id: string
+          content_data?: Json | null
+          content_text: string
+          content_title?: string | null
+          content_type: string
+          created_at?: string
+          date_created?: string
+          id?: string
+          is_delivered?: boolean | null
+        }
+        Update: {
+          child_id?: string
+          content_data?: Json | null
+          content_text?: string
+          content_title?: string | null
+          content_type?: string
+          created_at?: string
+          date_created?: string
+          id?: string
+          is_delivered?: boolean | null
+        }
+        Relationships: []
+      }
       families: {
         Row: {
           created_at: string | null
