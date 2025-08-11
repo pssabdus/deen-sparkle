@@ -4,12 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Plus, Settings, BarChart3, Gift, Target, LogOut } from 'lucide-react';
+import { Users, Plus, Settings, BarChart3, Gift, Target, LogOut, MessageCircle } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import ChildrenManagement from '@/components/ChildrenManagement';
 import GoalsManagement from '@/components/GoalsManagement';
 import RewardsManagement from '@/components/RewardsManagement';
 import FamilyAnalytics from '@/components/FamilyAnalytics';
+import IslamicAIChat from '@/components/IslamicAIChat';
 
 interface UserProfile {
   id: string;
@@ -131,7 +132,7 @@ const ParentDashboard = ({ userProfile }: ParentDashboardProps) => {
 
         {/* Main Tabs */}
         <Tabs defaultValue="children" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="children" className="gap-2">
               <Users className="w-4 h-4" />
               Children
@@ -147,6 +148,10 @@ const ParentDashboard = ({ userProfile }: ParentDashboardProps) => {
             <TabsTrigger value="analytics" className="gap-2">
               <BarChart3 className="w-4 h-4" />
               Analytics
+            </TabsTrigger>
+            <TabsTrigger value="ai-chat" className="gap-2">
+              <MessageCircle className="w-4 h-4" />
+              AI Assistant
             </TabsTrigger>
           </TabsList>
 
@@ -168,6 +173,10 @@ const ParentDashboard = ({ userProfile }: ParentDashboardProps) => {
 
           <TabsContent value="analytics">
             <FamilyAnalytics familyId={userProfile.family_id} />
+          </TabsContent>
+          
+          <TabsContent value="ai-chat">
+            <IslamicAIChat userRole="parent" />
           </TabsContent>
         </Tabs>
       </div>

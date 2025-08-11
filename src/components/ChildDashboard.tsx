@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Star, Flame, Book, Heart, Gift, LogOut, Award, Calendar } from 'lucide-react';
+import { Star, Flame, Book, Heart, Gift, LogOut, Award, Calendar, MessageCircle } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import PrayerTracker from '@/components/PrayerTracker';
 import StoryReader from '@/components/StoryReader';
@@ -14,6 +14,7 @@ import RewardStore from '@/components/RewardStore';
 import BadgeSystem from '@/components/BadgeSystem';
 import IslamicCompanion from '@/components/IslamicCompanion';
 import StreakTracker from '@/components/StreakTracker';
+import IslamicAIChat from '@/components/IslamicAIChat';
 
 interface UserProfile {
   id: string;
@@ -212,12 +213,16 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="activities" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="activities">Activities</TabsTrigger>
             <TabsTrigger value="badges">Badges</TabsTrigger>
             <TabsTrigger value="streaks">Streaks</TabsTrigger>
             <TabsTrigger value="stories">Stories</TabsTrigger>
             <TabsTrigger value="rewards">Rewards</TabsTrigger>
+            <TabsTrigger value="ai-chat">
+              <MessageCircle className="w-4 h-4 mr-1" />
+              Ask AI
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="activities" className="space-y-6">
@@ -314,6 +319,10 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
                 />
               </CardContent>
             </Card>
+          </TabsContent>
+          
+          <TabsContent value="ai-chat">
+            <IslamicAIChat userRole="child" childAge={childProfile.islamic_level} />
           </TabsContent>
         </Tabs>
       </div>
