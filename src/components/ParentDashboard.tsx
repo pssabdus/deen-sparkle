@@ -12,6 +12,7 @@ import RewardsManagement from '@/components/RewardsManagement';
 import FamilyAnalytics from '@/components/FamilyAnalytics';
 import IslamicAIChat from '@/components/IslamicAIChat';
 import StoryReader from '@/components/StoryReader';
+import IslamicFamilySocialSystem from '@/components/IslamicFamilySocialSystem';
 
 interface UserProfile {
   id: string;
@@ -133,7 +134,7 @@ const ParentDashboard = ({ userProfile }: ParentDashboardProps) => {
 
         {/* Main Tabs */}
         <Tabs defaultValue="children" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="children" className="gap-2">
               <Users className="w-4 h-4" />
               Children
@@ -153,6 +154,10 @@ const ParentDashboard = ({ userProfile }: ParentDashboardProps) => {
             <TabsTrigger value="analytics" className="gap-2">
               <BarChart3 className="w-4 h-4" />
               Analytics
+            </TabsTrigger>
+            <TabsTrigger value="family-social" className="gap-2">
+              <Users className="w-4 h-4" />
+              Family Social
             </TabsTrigger>
             <TabsTrigger value="ai-chat" className="gap-2">
               <MessageCircle className="w-4 h-4" />
@@ -186,6 +191,15 @@ const ParentDashboard = ({ userProfile }: ParentDashboardProps) => {
 
           <TabsContent value="analytics">
             <FamilyAnalytics familyId={userProfile.family_id} />
+          </TabsContent>
+
+          <TabsContent value="family-social">
+            <IslamicFamilySocialSystem 
+              familyId={userProfile.family_id!}
+              userRole="parent"
+              userId={userProfile.id}
+              childrenData={children}
+            />
           </TabsContent>
           
           <TabsContent value="ai-chat">

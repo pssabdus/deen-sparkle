@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Star, Flame, Book, Heart, Gift, LogOut, Award, Calendar, MessageCircle, Gamepad2 } from 'lucide-react';
+import { Star, Flame, Book, Heart, Gift, LogOut, Award, Calendar, MessageCircle, Gamepad2, Users } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import PrayerTracker from '@/components/PrayerTracker';
 import StoryReader from '@/components/StoryReader';
@@ -18,6 +18,7 @@ import InteractiveIslamicCompanion from '@/components/InteractiveIslamicCompanio
 import IslamicLearningGames from '@/components/IslamicLearningGames';
 import IslamicPrayerManager from '@/components/IslamicPrayerManager';
 import IslamicMotivationSystem from '@/components/IslamicMotivationSystem';
+import IslamicFamilySocialSystem from '@/components/IslamicFamilySocialSystem';
 
 interface UserProfile {
   id: string;
@@ -221,7 +222,7 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="activities" className="w-full">
-          <TabsList className="grid w-full grid-cols-8">
+          <TabsList className="grid w-full grid-cols-9">
             <TabsTrigger value="activities">Activities</TabsTrigger>
             <TabsTrigger value="games">
               <Gamepad2 className="w-4 h-4 mr-1" />
@@ -234,6 +235,10 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
             <TabsTrigger value="motivation">
               <Heart className="w-4 h-4 mr-1" />
               Motivation
+            </TabsTrigger>
+            <TabsTrigger value="family-social">
+              <Users className="w-4 h-4 mr-1" />
+              Family
             </TabsTrigger>
             <TabsTrigger value="ai-chat">
               <MessageCircle className="w-4 h-4 mr-1" />
@@ -309,6 +314,15 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
               childId={childProfile.id}
               familyId={childProfile.family_id}
               userRole="child"
+            />
+          </TabsContent>
+
+          <TabsContent value="family-social">
+            <IslamicFamilySocialSystem 
+              familyId={childProfile.family_id}
+              userRole="child"
+              userId={userProfile.id}
+              childrenData={[childProfile]}
             />
           </TabsContent>
 
