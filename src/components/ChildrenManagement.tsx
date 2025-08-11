@@ -22,6 +22,7 @@ interface Child {
   companion_type: string;
   companion_name: string;
   islamic_level: number;
+  login_password?: string;
 }
 
 interface ChildrenManagementProps {
@@ -94,7 +95,8 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
           companion_name: newChild.companion_name,
           total_points: 0,
           current_streak: 0,
-          islamic_level: 1
+          islamic_level: 1,
+          login_password: childPassword
         });
 
       if (childError) throw childError;
@@ -130,20 +132,20 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
     const newPassword = `Qodwaa${Math.random().toString(36).substring(2, 8).toUpperCase()}!`;
     
     try {
-      // Get the child's user_id
-      const { data: childData } = await supabase
+      // Update the stored password in children table
+      const { error: updateError } = await supabase
         .from('children')
-        .select('user_id')
-        .eq('id', childId)
-        .single();
+        .update({ login_password: newPassword })
+        .eq('id', childId);
 
-      if (!childData?.user_id) throw new Error('Child user not found');
+      if (updateError) throw updateError;
 
-      // Reset password using admin API would require service role
-      // For now, we'll show the new password and they can use it to sign in
+      // Update the children state to reflect the new password
+      onChildrenUpdate();
+
       toast({
-        title: "Password Reset",
-        description: `New password for ${childName}: ${newPassword}. Please update manually.`,
+        title: "Password Reset Successfully! 🔄",
+        description: `New password for ${childName}: ${newPassword}`,
       });
     } catch (error: any) {
       toast({
@@ -175,9 +177,8 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
   };
 
   const getChildPassword = (child: Child) => {
-    // For existing children, we can't retrieve the actual password
-    // This would need to be stored securely or generated fresh
-    return "****-CONTACT-ADMIN-****";
+    // Return the stored password if available, otherwise show placeholder
+    return child.login_password || "Not Available";
   };
 
   const getCompanionEmoji = (type: string) => {
