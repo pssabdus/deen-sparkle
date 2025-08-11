@@ -72,6 +72,14 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
 
       if (authError) throw authError;
 
+      // Immediately restore parent session to prevent child session from taking over
+      if (currentSession) {
+        await supabase.auth.setSession({
+          access_token: currentSession.access_token,
+          refresh_token: currentSession.refresh_token
+        });
+      }
+
       // Update user record with correct role and family_id (trigger creates basic record)
       const { error: userError } = await supabase
         .from('users')
@@ -101,14 +109,6 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
         });
 
       if (childError) throw childError;
-
-      // Restore parent session to keep them logged in
-      if (currentSession) {
-        await supabase.auth.setSession({
-          access_token: currentSession.access_token,
-          refresh_token: currentSession.refresh_token
-        });
-      }
 
       // Store credentials to display
       setCreatedCredentials({ email: childEmail, password: childPassword });

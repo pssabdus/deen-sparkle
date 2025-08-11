@@ -46,39 +46,62 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
 
   useEffect(() => {
     fetchChildProfile();
-    fetchTodayPrayers();
   }, [userProfile.id]);
 
-  const fetchChildProfile = async () => {
-    const { data, error } = await supabase
-      .from('children')
-      .select('*')
-      .eq('user_id', userProfile.id)
-      .single();
+  useEffect(() => {
+    if (childProfile?.id) {
+      fetchTodayPrayers();
+    }
+  }, [childProfile?.id]);
 
-    if (error) {
-      console.error('Error fetching child profile:', error);
-    } else {
+  const fetchChildProfile = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('children')
+        .select('*')
+        .eq('user_id', userProfile.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching child profile:', error);
+        setLoading(false);
+        return;
+      }
+      
+      if (!data) {
+        console.error('No child profile found for user:', userProfile.id);
+        setLoading(false);
+        return;
+      }
+      
       setChildProfile(data);
+    } catch (error) {
+      console.error('Error in fetchChildProfile:', error);
+      setLoading(false);
     }
   };
 
   const fetchTodayPrayers = async () => {
     if (!childProfile?.id) return;
 
-    const today = new Date().toISOString().split('T')[0];
-    const { data, error } = await supabase
-      .from('prayer_times')
-      .select('*')
-      .eq('child_id', childProfile.id)
-      .eq('prayer_date', today);
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from('prayer_times')
+        .select('*')
+        .eq('child_id', childProfile.id)
+        .eq('prayer_date', today);
 
-    if (error) {
-      console.error('Error fetching prayers:', error);
-    } else {
-      setTodayPrayers(data || []);
+      if (error) {
+        console.error('Error fetching prayers:', error);
+      } else {
+        setTodayPrayers(data || []);
+      }
+    } catch (error) {
+      console.error('Error in fetchTodayPrayers:', error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const getCompanionEmoji = (type: string) => {
