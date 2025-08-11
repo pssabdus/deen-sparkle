@@ -11,7 +11,7 @@ import { toast } from '@/components/ui/use-toast';
 import PrayerTracker from '@/components/PrayerTracker';
 import StoryReader from '@/components/StoryReader';
 import RewardStore from '@/components/RewardStore';
-import BadgeSystem from '@/components/BadgeSystem';
+import IslamicAchievementSystem from '@/components/IslamicAchievementSystem';
 import IslamicCompanion from '@/components/IslamicCompanion';
 import StreakTracker from '@/components/StreakTracker';
 import IslamicAIChat from '@/components/IslamicAIChat';
