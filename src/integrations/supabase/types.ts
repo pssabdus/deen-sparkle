@@ -242,6 +242,61 @@ export type Database = {
           },
         ]
       }
+      child_companion_config: {
+        Row: {
+          child_id: string
+          created_at: string
+          customizations: Json | null
+          effectiveness_metrics: Json | null
+          id: string
+          last_adapted_at: string | null
+          personality_id: string
+          updated_at: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          customizations?: Json | null
+          effectiveness_metrics?: Json | null
+          id?: string
+          last_adapted_at?: string | null
+          personality_id: string
+          updated_at?: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          customizations?: Json | null
+          effectiveness_metrics?: Json | null
+          id?: string
+          last_adapted_at?: string | null
+          personality_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "child_companion_config_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: true
+            referencedRelation: "child_analytics_view"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "child_companion_config_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: true
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "child_companion_config_personality_id_fkey"
+            columns: ["personality_id"]
+            isOneToOne: false
+            referencedRelation: "islamic_companion_personalities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       child_islamic_milestones: {
         Row: {
           achievement_id: string
@@ -293,6 +348,51 @@ export type Database = {
           },
           {
             foreignKeyName: "child_islamic_milestones_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      child_spiritual_patterns: {
+        Row: {
+          child_id: string
+          confidence_score: number | null
+          created_at: string
+          id: string
+          observed_at: string
+          pattern_data: Json
+          pattern_type: string
+        }
+        Insert: {
+          child_id: string
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          observed_at?: string
+          pattern_data?: Json
+          pattern_type: string
+        }
+        Update: {
+          child_id?: string
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          observed_at?: string
+          pattern_data?: Json
+          pattern_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "child_spiritual_patterns_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "child_analytics_view"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "child_spiritual_patterns_child_id_fkey"
             columns: ["child_id"]
             isOneToOne: false
             referencedRelation: "children"
@@ -535,6 +635,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "family_islamic_challenges_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_islamic_insights: {
+        Row: {
+          actionable_recommendations: string[] | null
+          confidence_level: number | null
+          created_at: string
+          family_id: string
+          generated_at: string
+          id: string
+          insight_data: Json
+          insight_type: string
+          is_active: boolean | null
+        }
+        Insert: {
+          actionable_recommendations?: string[] | null
+          confidence_level?: number | null
+          created_at?: string
+          family_id: string
+          generated_at?: string
+          id?: string
+          insight_data?: Json
+          insight_type: string
+          is_active?: boolean | null
+        }
+        Update: {
+          actionable_recommendations?: string[] | null
+          confidence_level?: number | null
+          created_at?: string
+          family_id?: string
+          generated_at?: string
+          id?: string
+          insight_data?: Json
+          insight_type?: string
+          is_active?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_islamic_insights_family_id_fkey"
             columns: ["family_id"]
             isOneToOne: false
             referencedRelation: "families"
@@ -900,6 +1044,45 @@ export type Database = {
         }
         Relationships: []
       }
+      islamic_companion_personalities: {
+        Row: {
+          age_suitability: string | null
+          created_at: string
+          description: string
+          id: string
+          interaction_patterns: Json | null
+          islamic_characteristics: Json | null
+          motivation_style: string
+          name: string
+          personality_traits: Json
+          preferred_content_types: string[] | null
+        }
+        Insert: {
+          age_suitability?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          interaction_patterns?: Json | null
+          islamic_characteristics?: Json | null
+          motivation_style: string
+          name: string
+          personality_traits?: Json
+          preferred_content_types?: string[] | null
+        }
+        Update: {
+          age_suitability?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          interaction_patterns?: Json | null
+          islamic_characteristics?: Json | null
+          motivation_style?: string
+          name?: string
+          personality_traits?: Json
+          preferred_content_types?: string[] | null
+        }
+        Relationships: []
+      }
       islamic_educators: {
         Row: {
           approval_level: string | null
@@ -941,6 +1124,64 @@ export type Database = {
           verification_status?: string | null
         }
         Relationships: []
+      }
+      islamic_encouragements: {
+        Row: {
+          child_id: string
+          child_response: string | null
+          content_id: string
+          created_at: string
+          delivered_at: string
+          effectiveness_score: number | null
+          id: string
+          personalization_data: Json | null
+          trigger_reason: string
+        }
+        Insert: {
+          child_id: string
+          child_response?: string | null
+          content_id: string
+          created_at?: string
+          delivered_at?: string
+          effectiveness_score?: number | null
+          id?: string
+          personalization_data?: Json | null
+          trigger_reason: string
+        }
+        Update: {
+          child_id?: string
+          child_response?: string | null
+          content_id?: string
+          created_at?: string
+          delivered_at?: string
+          effectiveness_score?: number | null
+          id?: string
+          personalization_data?: Json | null
+          trigger_reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "islamic_encouragements_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "child_analytics_view"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "islamic_encouragements_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "islamic_encouragements_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "islamic_motivational_content"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       islamic_learning_goals: {
         Row: {
@@ -990,6 +1231,54 @@ export type Database = {
         }
         Relationships: []
       }
+      islamic_motivational_content: {
+        Row: {
+          age_group: string
+          arabic_text: string | null
+          authenticity_level: string | null
+          content_type: string
+          created_at: string
+          emotional_tone: string | null
+          english_translation: string
+          id: string
+          occasion: string | null
+          source_reference: string
+          theme: string
+          transliteration: string | null
+          updated_at: string
+        }
+        Insert: {
+          age_group: string
+          arabic_text?: string | null
+          authenticity_level?: string | null
+          content_type: string
+          created_at?: string
+          emotional_tone?: string | null
+          english_translation: string
+          id?: string
+          occasion?: string | null
+          source_reference: string
+          theme: string
+          transliteration?: string | null
+          updated_at?: string
+        }
+        Update: {
+          age_group?: string
+          arabic_text?: string | null
+          authenticity_level?: string | null
+          content_type?: string
+          created_at?: string
+          emotional_tone?: string | null
+          english_translation?: string
+          id?: string
+          occasion?: string | null
+          source_reference?: string
+          theme?: string
+          transliteration?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       islamic_personality_types: {
         Row: {
           companion_type: string | null
@@ -1017,6 +1306,51 @@ export type Database = {
           learning_style?: Json | null
           name?: string
           preferred_activities?: Json | null
+        }
+        Relationships: []
+      }
+      islamic_special_days: {
+        Row: {
+          activities: Json | null
+          age_recommendations: string | null
+          created_at: string
+          date_type: string
+          date_value: string | null
+          description: string
+          educational_content: Json | null
+          family_activities: Json | null
+          id: string
+          name_arabic: string | null
+          name_english: string
+          significance: string
+        }
+        Insert: {
+          activities?: Json | null
+          age_recommendations?: string | null
+          created_at?: string
+          date_type: string
+          date_value?: string | null
+          description: string
+          educational_content?: Json | null
+          family_activities?: Json | null
+          id?: string
+          name_arabic?: string | null
+          name_english: string
+          significance: string
+        }
+        Update: {
+          activities?: Json | null
+          age_recommendations?: string | null
+          created_at?: string
+          date_type?: string
+          date_value?: string | null
+          description?: string
+          educational_content?: Json | null
+          family_activities?: Json | null
+          id?: string
+          name_arabic?: string | null
+          name_english?: string
+          significance?: string
         }
         Relationships: []
       }
@@ -1064,6 +1398,57 @@ export type Database = {
           title?: string
         }
         Relationships: []
+      }
+      islamic_surprise_rewards: {
+        Row: {
+          child_id: string
+          child_reaction: string | null
+          created_at: string
+          delivered_at: string
+          id: string
+          islamic_significance: string | null
+          reward_data: Json
+          reward_type: string
+          trigger_reason: string
+        }
+        Insert: {
+          child_id: string
+          child_reaction?: string | null
+          created_at?: string
+          delivered_at?: string
+          id?: string
+          islamic_significance?: string | null
+          reward_data?: Json
+          reward_type: string
+          trigger_reason: string
+        }
+        Update: {
+          child_id?: string
+          child_reaction?: string | null
+          created_at?: string
+          delivered_at?: string
+          id?: string
+          islamic_significance?: string | null
+          reward_data?: Json
+          reward_type?: string
+          trigger_reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "islamic_surprise_rewards_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "child_analytics_view"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "islamic_surprise_rewards_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       islamic_terminology: {
         Row: {
