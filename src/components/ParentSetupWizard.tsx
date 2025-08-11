@@ -4,13 +4,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, MapPin, Clock, User, Target, Gift, Star, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
+import { Loader2, MapPin, Clock, User, Target, Gift, Star, ArrowLeft, ArrowRight, CheckCircle, Calendar, Award, Book } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -36,22 +35,35 @@ interface PrayerTimes {
   };
 }
 
+interface LearningGoal {
+  type: string;
+  title: string;
+  target: number;
+  deadline: string;
+  priority: string;
+}
+
 interface SetupData {
   childInfo: ChildInfo;
   location: { latitude: number; longitude: number } | null;
   prayerTimes: PrayerTimes | null;
-  goals: any[];
-  rewards: any[];
-  schedule: any[];
+  personalityType: string;
+  learningGoals: LearningGoal[];
+  weeklySchedule: any;
+  preferences: {
+    language: string;
+    calculationMethod: string;
+    parentalControls: string[];
+  };
 }
 
 const WIZARD_STEPS = [
   { id: 'child-info', title: 'Child Information', description: 'Basic details about your child' },
   { id: 'location', title: 'Prayer Times Setup', description: 'Location for accurate prayer times' },
   { id: 'personality', title: 'Personality Quiz', description: 'Choose the perfect Islamic companion' },
-  { id: 'goals', title: 'Learning Goals', description: 'Age-appropriate milestones' },
-  { id: 'rewards', title: 'Family Rewards', description: 'Customize reward preferences' },
-  { id: 'schedule', title: 'Learning Schedule', description: 'Weekly routine recommendations' },
+  { id: 'goals', title: 'Learning Goals', description: 'Set Islamic learning objectives' },
+  { id: 'schedule', title: 'Weekly Schedule', description: 'Plan Islamic activities' },
+  { id: 'preferences', title: 'Family Preferences', description: 'Customize the experience' },
   { id: 'preview', title: 'Preview & Confirm', description: 'Review your setup' }
 ];
 
@@ -64,32 +76,54 @@ const PERSONALITY_QUESTIONS = [
   {
     question: "How does your child prefer to learn?",
     options: [
-      { value: 'visual', label: 'Through pictures and visual aids', companion: 'angel' },
-      { value: 'interactive', label: 'Through games and activities', companion: 'pet' },
-      { value: 'storytelling', label: 'Through stories and narratives', companion: 'wizard' }
+      { value: 'visual', label: 'Through pictures and visual aids', companion: 'wise_owl' },
+      { value: 'interactive', label: 'Through games and activities', companion: 'friendly_cat' },
+      { value: 'storytelling', label: 'Through stories and narratives', companion: 'peaceful_dove' },
+      { value: 'creative', label: 'Through creative expression', companion: 'playful_dolphin' }
     ]
   },
   {
     question: "What motivates your child most?",
     options: [
-      { value: 'praise', label: 'Words of encouragement and praise', companion: 'angel' },
-      { value: 'fun', label: 'Fun activities and rewards', companion: 'pet' },
-      { value: 'achievement', label: 'Completing challenges and goals', companion: 'wizard' }
+      { value: 'praise', label: 'Words of encouragement and praise', companion: 'wise_owl' },
+      { value: 'fun', label: 'Fun activities and rewards', companion: 'friendly_cat' },
+      { value: 'achievement', label: 'Completing challenges and goals', companion: 'peaceful_dove' },
+      { value: 'exploration', label: 'Discovering new things', companion: 'playful_dolphin' }
     ]
   },
   {
     question: "How does your child handle new concepts?",
     options: [
-      { value: 'gentle', label: 'Needs gentle, patient introduction', companion: 'angel' },
-      { value: 'enthusiastic', label: 'Jumps in with enthusiasm', companion: 'pet' },
-      { value: 'analytical', label: 'Likes to understand deeply first', companion: 'wizard' }
+      { value: 'analytical', label: 'Likes to understand deeply first', companion: 'wise_owl' },
+      { value: 'enthusiastic', label: 'Jumps in with enthusiasm', companion: 'friendly_cat' },
+      { value: 'gentle', label: 'Needs gentle, patient introduction', companion: 'peaceful_dove' },
+      { value: 'curious', label: 'Explores through curiosity', companion: 'playful_dolphin' }
     ]
   }
+];
+
+const GOAL_TYPES = [
+  { value: 'quran', label: 'Quran Memorization', icon: '📖', description: 'Memorize verses or surahs' },
+  { value: 'prayer', label: 'Prayer Consistency', icon: '🤲', description: 'Regular prayer practice' },
+  { value: 'arabic', label: 'Arabic Learning', icon: '✨', description: 'Learn Arabic letters and words' },
+  { value: 'hadith', label: 'Hadith Learning', icon: '💫', description: 'Learn prophetic sayings' },
+  { value: 'good_deeds', label: 'Good Deeds', icon: '❤️', description: 'Daily acts of kindness' },
+  { value: 'dua', label: 'Dua Memorization', icon: '🌟', description: 'Learn daily supplications' }
+];
+
+const PARENTAL_CONTROLS = [
+  'Content filtering',
+  'Time limits',
+  'Progress notifications',
+  'Weekly reports',
+  'Companion behavior monitoring'
 ];
 
 const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> = ({ familyId, onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [personalityTypes, setPersonalityTypes] = useState<any[]>([]);
+  const [calculationMethods, setCalculationMethods] = useState<any[]>([]);
   const [setupData, setSetupData] = useState<SetupData>({
     childInfo: {
       name: '',
@@ -101,12 +135,35 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
     },
     location: null,
     prayerTimes: null,
-    goals: [],
-    rewards: [],
-    schedule: []
+    personalityType: '',
+    learningGoals: [],
+    weeklySchedule: {},
+    preferences: {
+      language: 'en',
+      calculationMethod: '',
+      parentalControls: []
+    }
   });
   const [personalityAnswers, setPersonalityAnswers] = useState<string[]>([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [personalityTypesRes, calculationMethodsRes] = await Promise.all([
+          supabase.from('islamic_personality_types').select('*'),
+          supabase.from('prayer_calculation_methods').select('*')
+        ]);
+
+        if (personalityTypesRes.data) setPersonalityTypes(personalityTypesRes.data);
+        if (calculationMethodsRes.data) setCalculationMethods(calculationMethodsRes.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const progressPercentage = ((currentStep + 1) / WIZARD_STEPS.length) * 100;
 
@@ -328,7 +385,7 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
   // Step 3: Personality Quiz
   const renderPersonalityStep = () => {
     const determineCompanion = () => {
-      const companionCounts = { angel: 0, pet: 0, wizard: 0 };
+      const companionCounts = { wise_owl: 0, friendly_cat: 0, peaceful_dove: 0, playful_dolphin: 0 };
       
       personalityAnswers.forEach((answer, index) => {
         const selectedOption = PERSONALITY_QUESTIONS[index].options.find(opt => opt.value === answer);
@@ -343,6 +400,7 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
 
       setSetupData(prev => ({
         ...prev,
+        personalityType: companion,
         childInfo: { ...prev.childInfo, personalityType: companion }
       }));
     };
@@ -352,6 +410,21 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
         determineCompanion();
       }
     }, [personalityAnswers]);
+
+    const getCompanionInfo = (type: string) => {
+      switch (type) {
+        case 'wise_owl':
+          return { emoji: '🦉', name: 'Wise Owl', description: 'A thoughtful, analytical companion perfect for deep learners' };
+        case 'friendly_cat':
+          return { emoji: '🐱', name: 'Friendly Cat', description: 'A playful, energetic companion that makes learning fun' };
+        case 'peaceful_dove':
+          return { emoji: '🕊️', name: 'Peaceful Dove', description: 'A gentle, calming companion for patient learners' };
+        case 'playful_dolphin':
+          return { emoji: '🐬', name: 'Playful Dolphin', description: 'A creative, curious companion for explorers' };
+        default:
+          return { emoji: '✨', name: 'Guardian', description: 'A special companion' };
+      }
+    };
 
     return (
       <div className="space-y-6">
@@ -387,25 +460,18 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
           </Card>
         ))}
 
-        {setupData.childInfo.personalityType && (
+        {setupData.personalityType && (
           <Card className="bg-gradient-to-r from-islamic-green/10 to-islamic-blue/10">
             <CardContent className="pt-6">
               <div className="text-center">
                 <div className="text-4xl mb-2">
-                  {setupData.childInfo.personalityType === 'angel' && '😇'}
-                  {setupData.childInfo.personalityType === 'pet' && '🐱'}
-                  {setupData.childInfo.personalityType === 'wizard' && '🧙‍♂️'}
+                  {getCompanionInfo(setupData.personalityType).emoji}
                 </div>
                 <h4 className="font-semibold text-lg">
-                  Perfect! Your child's companion will be a{' '}
-                  {setupData.childInfo.personalityType === 'angel' && 'Guardian Angel'}
-                  {setupData.childInfo.personalityType === 'pet' && 'Friendly Pet'}
-                  {setupData.childInfo.personalityType === 'wizard' && 'Wise Wizard'}
+                  Perfect! Your child's companion will be {getCompanionInfo(setupData.personalityType).name}
                 </h4>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {setupData.childInfo.personalityType === 'angel' && 'A gentle, encouraging companion perfect for patient learners'}
-                  {setupData.childInfo.personalityType === 'pet' && 'A playful, energetic companion that makes learning fun'}
-                  {setupData.childInfo.personalityType === 'wizard' && 'A wise, knowledgeable companion for curious minds'}
+                  {getCompanionInfo(setupData.personalityType).description}
                 </p>
               </div>
             </CardContent>
@@ -414,6 +480,282 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
       </div>
     );
   };
+
+  // Step 4: Learning Goals
+  const renderGoalsStep = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h3 className="text-xl font-semibold mb-2">Set Learning Goals</h3>
+        <p className="text-muted-foreground">
+          Choose age-appropriate Islamic learning objectives for your child
+        </p>
+      </div>
+
+      <div className="grid gap-4">
+        {GOAL_TYPES.map((goalType) => (
+          <Card 
+            key={goalType.value} 
+            className={`cursor-pointer transition-all ${
+              setupData.learningGoals.some(g => g.type === goalType.value) 
+                ? 'ring-2 ring-islamic-green bg-islamic-green/5' 
+                : 'hover:bg-muted/50'
+            }`}
+            onClick={() => {
+              const hasGoal = setupData.learningGoals.some(g => g.type === goalType.value);
+              if (hasGoal) {
+                setSetupData(prev => ({
+                  ...prev,
+                  learningGoals: prev.learningGoals.filter(g => g.type !== goalType.value)
+                }));
+              } else {
+                setSetupData(prev => ({
+                  ...prev,
+                  learningGoals: [...prev.learningGoals, {
+                    type: goalType.value,
+                    title: goalType.label,
+                    target: goalType.value === 'prayer' ? 5 : goalType.value === 'quran' ? 3 : 7,
+                    deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    priority: 'medium'
+                  }]
+                }));
+              }
+            }}
+          >
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="text-2xl">{goalType.icon}</div>
+                <div className="flex-1">
+                  <h4 className="font-medium">{goalType.label}</h4>
+                  <p className="text-sm text-muted-foreground">{goalType.description}</p>
+                </div>
+                {setupData.learningGoals.some(g => g.type === goalType.value) && (
+                  <CheckCircle className="w-5 h-5 text-islamic-green" />
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {setupData.learningGoals.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="w-5 h-5" />
+              Selected Goals
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {setupData.learningGoals.map((goal, index) => (
+                <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
+                  <span className="font-medium">{goal.title}</span>
+                  <Badge variant="secondary">Target: {goal.target}</Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+
+  // Step 5: Weekly Schedule
+  const renderScheduleStep = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h3 className="text-xl font-semibold mb-2">Weekly Schedule</h3>
+        <p className="text-muted-foreground">
+          Set up a routine for your child's Islamic learning activities
+        </p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="w-5 h-5" />
+            Recommended Schedule
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="grid grid-cols-7 gap-2 text-center text-sm font-medium">
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                <div key={day} className="p-2 bg-muted rounded">{day}</div>
+              ))}
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <span className="text-sm">Prayer Practice (5 times daily)</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span className="text-sm">Quran Study (15 minutes daily)</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                <span className="text-sm">Islamic Stories (Bedtime)</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                <span className="text-sm">Good Deeds Challenge (Weekends)</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  // Step 6: Family Preferences
+  const renderPreferencesStep = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h3 className="text-xl font-semibold mb-2">Family Preferences</h3>
+        <p className="text-muted-foreground">
+          Customize the experience for your family's needs
+        </p>
+      </div>
+
+      <div className="space-y-6">
+        <div>
+          <Label>Preferred Language</Label>
+          <Select
+            value={setupData.preferences.language}
+            onValueChange={(value) => setSetupData(prev => ({
+              ...prev,
+              preferences: { ...prev.preferences, language: value }
+            }))}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select language" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="en">English</SelectItem>
+              <SelectItem value="ar">Arabic</SelectItem>
+              <SelectItem value="ur">Urdu</SelectItem>
+              <SelectItem value="fr">French</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label>Prayer Calculation Method</Label>
+          <Select
+            value={setupData.preferences.calculationMethod}
+            onValueChange={(value) => setSetupData(prev => ({
+              ...prev,
+              preferences: { ...prev.preferences, calculationMethod: value }
+            }))}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select calculation method" />
+            </SelectTrigger>
+            <SelectContent>
+              {calculationMethods.map((method) => (
+                <SelectItem key={method.id} value={method.id}>
+                  {method.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label>Parental Controls (Select multiple)</Label>
+          <div className="grid grid-cols-1 gap-2 mt-2">
+            {PARENTAL_CONTROLS.map((control) => (
+              <div key={control} className="flex items-center space-x-2">
+                <Checkbox
+                  id={control}
+                  checked={setupData.preferences.parentalControls.includes(control)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setSetupData(prev => ({
+                        ...prev,
+                        preferences: {
+                          ...prev.preferences,
+                          parentalControls: [...prev.preferences.parentalControls, control]
+                        }
+                      }));
+                    } else {
+                      setSetupData(prev => ({
+                        ...prev,
+                        preferences: {
+                          ...prev.preferences,
+                          parentalControls: prev.preferences.parentalControls.filter(c => c !== control)
+                        }
+                      }));
+                    }
+                  }}
+                />
+                <Label htmlFor={control} className="text-sm">{control}</Label>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Step 7: Preview & Confirm
+  const renderPreviewStep = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h3 className="text-xl font-semibold mb-2">Review Your Setup</h3>
+        <p className="text-muted-foreground">
+          Please review all the information before completing the setup
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="w-5 h-5" />
+              Child Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div><strong>Name:</strong> {setupData.childInfo.name}</div>
+              <div><strong>Gender:</strong> {setupData.childInfo.gender}</div>
+              <div><strong>Islamic Level:</strong> Level {setupData.childInfo.islamicLevel}</div>
+              <div><strong>Companion:</strong> {setupData.personalityType}</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="w-5 h-5" />
+              Learning Goals
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {setupData.learningGoals.map((goal, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <span className="text-sm">{goal.title}</span>
+                  <Badge variant="outline">Target: {goal.target}</Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="bg-islamic-green/10 p-4 rounded-lg text-center">
+        <h4 className="font-semibold text-islamic-green mb-2">🎉 Everything looks great!</h4>
+        <p className="text-sm text-muted-foreground">
+          Your child's Islamic learning journey is ready to begin. Click complete to finish the setup.
+        </p>
+      </div>
+    </div>
+  );
 
   // Navigation functions
   const canProceed = () => {
@@ -424,6 +766,14 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
         return setupData.location && setupData.prayerTimes;
       case 2:
         return personalityAnswers.length === PERSONALITY_QUESTIONS.length;
+      case 3:
+        return setupData.learningGoals.length > 0;
+      case 4:
+        return true; // Schedule is optional
+      case 5:
+        return setupData.preferences.language && setupData.preferences.calculationMethod;
+      case 6:
+        return true; // Final review
       default:
         return true;
     }
@@ -451,9 +801,16 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
         date_of_birth: setupData.childInfo.dateOfBirth,
         gender: setupData.childInfo.gender,
         islamic_level: setupData.childInfo.islamicLevel,
-        companion_type: setupData.childInfo.personalityType,
-        companion_name: setupData.childInfo.personalityType === 'angel' ? 'Guardian' :
-                       setupData.childInfo.personalityType === 'pet' ? 'Buddy' : 'Scholar',
+        companion_type: setupData.personalityType,
+        companion_name: setupData.personalityType === 'wise_owl' ? 'Scholar' :
+                       setupData.personalityType === 'friendly_cat' ? 'Buddy' :
+                       setupData.personalityType === 'peaceful_dove' ? 'Guardian' : 'Explorer',
+        islamic_profile: {
+          personality_type: setupData.personalityType,
+          interests: setupData.childInfo.interests,
+          personality_answers: personalityAnswers
+        },
+        learning_schedule: setupData.weeklySchedule,
         preferences: {
           interests: setupData.childInfo.interests,
           personality_answers: personalityAnswers
@@ -467,6 +824,42 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
         .single();
 
       if (childError) throw childError;
+
+      // Create learning goals
+      if (setupData.learningGoals.length > 0 && childRecord) {
+        const goalsData = setupData.learningGoals.map(goal => ({
+          child_id: childRecord.id,
+          goal_type: goal.type,
+          title: goal.title,
+          target_value: goal.target,
+          deadline: goal.deadline,
+          priority: goal.priority,
+          created_by: familyId
+        }));
+
+        const { error: goalsError } = await supabase
+          .from('islamic_learning_goals')
+          .insert(goalsData);
+
+        if (goalsError) throw goalsError;
+      }
+
+      // Create family Islamic preferences
+      const preferencesData = {
+        family_id: familyId,
+        prayer_method_id: setupData.preferences.calculationMethod,
+        preferred_language: setupData.preferences.language,
+        learning_preferences: {
+          parental_controls: setupData.preferences.parentalControls,
+          weekly_schedule: setupData.weeklySchedule
+        }
+      };
+
+      const { error: preferencesError } = await supabase
+        .from('family_islamic_preferences')
+        .insert(preferencesData);
+
+      if (preferencesError) throw preferencesError;
 
       // Set up prayer times if available
       if (setupData.prayerTimes && childRecord) {
@@ -483,22 +876,20 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
           .from('prayer_times')
           .insert(prayerTimeEntries);
 
-        if (prayerError) {
-          console.error('Error setting up prayer times:', prayerError);
-        }
+        if (prayerError) throw prayerError;
       }
 
       toast({
-        title: "Setup Complete!",
-        description: "Your child's profile has been created successfully",
+        title: "Setup Complete! 🎉",
+        description: "Your child's Islamic learning journey has been set up successfully.",
       });
 
       onComplete();
     } catch (error) {
-      console.error('Error completing setup:', error);
+      console.error('Setup error:', error);
       toast({
-        title: "Error",
-        description: "Failed to complete setup. Please try again.",
+        title: "Setup Failed",
+        description: "There was an error completing the setup. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -506,158 +897,94 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
     }
   };
 
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 0: return renderChildInfoStep();
+      case 1: return renderLocationStep();
+      case 2: return renderPersonalityStep();
+      case 3: return renderGoalsStep();
+      case 4: return renderScheduleStep();
+      case 5: return renderPreferencesStep();
+      case 6: return renderPreviewStep();
+      default: return null;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-islamic-cream p-6">
+    <div className="min-h-screen bg-gradient-to-br from-islamic-green/10 via-white to-islamic-blue/10 p-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Welcome to Qodwaa Family Setup! 🌙
-          </h1>
-          <p className="text-muted-foreground">
-            Let's create the perfect Islamic learning experience for your child
-          </p>
-        </div>
+        <Card className="shadow-xl">
+          <CardHeader className="bg-gradient-to-r from-islamic-green to-islamic-blue text-white rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-2xl">Islamic Family Setup</CardTitle>
+                <p className="text-islamic-green-light mt-1">
+                  {WIZARD_STEPS[currentStep].title} - {WIZARD_STEPS[currentStep].description}
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="text-sm opacity-90">Step {currentStep + 1} of {WIZARD_STEPS.length}</div>
+                <Progress value={progressPercentage} className="w-32 mt-1" />
+              </div>
+            </div>
+          </CardHeader>
 
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-muted-foreground">
-              Step {currentStep + 1} of {WIZARD_STEPS.length}
-            </span>
-            <span className="text-sm font-medium text-muted-foreground">
-              {Math.round(progressPercentage)}% Complete
-            </span>
-          </div>
-          <Progress value={progressPercentage} className="h-2" />
-          <div className="mt-2 text-center">
-            <h2 className="text-xl font-semibold">{WIZARD_STEPS[currentStep].title}</h2>
-            <p className="text-sm text-muted-foreground">{WIZARD_STEPS[currentStep].description}</p>
-          </div>
-        </div>
-
-        {/* Step Content */}
-        <Card className="mb-8">
           <CardContent className="p-8">
-            {currentStep === 0 && renderChildInfoStep()}
-            {currentStep === 1 && renderLocationStep()}
-            {currentStep === 2 && renderPersonalityStep()}
-            {currentStep === 3 && (
-              <div className="text-center py-12">
-                <Target className="w-16 h-16 text-islamic-green mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Learning Goals (Coming in next steps)</h3>
-                <p className="text-muted-foreground">Age-appropriate Islamic learning milestones</p>
-              </div>
-            )}
-            {currentStep === 4 && (
-              <div className="text-center py-12">
-                <Gift className="w-16 h-16 text-islamic-gold mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Family Rewards (Coming in next steps)</h3>
-                <p className="text-muted-foreground">Customize your family's reward system</p>
-              </div>
-            )}
-            {currentStep === 5 && (
-              <div className="text-center py-12">
-                <Star className="w-16 h-16 text-islamic-blue mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Learning Schedule (Coming in next steps)</h3>
-                <p className="text-muted-foreground">Weekly routine recommendations</p>
-              </div>
-            )}
-            {currentStep === 6 && (
-              <div className="space-y-6">
-                <div className="text-center">
-                  <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Setup Complete!</h3>
-                  <p className="text-muted-foreground">
-                    Review your configuration and click Complete to finish setup
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <User className="w-5 h-5" />
-                        Child Information
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <div><strong>Name:</strong> {setupData.childInfo.name}</div>
-                      <div><strong>Age:</strong> {new Date().getFullYear() - new Date(setupData.childInfo.dateOfBirth).getFullYear()} years</div>
-                      <div><strong>Gender:</strong> {setupData.childInfo.gender}</div>
-                      <div><strong>Islamic Level:</strong> Level {setupData.childInfo.islamicLevel}</div>
-                      <div><strong>Companion:</strong> {setupData.childInfo.personalityType}</div>
-                    </CardContent>
-                  </Card>
-
-                  {setupData.prayerTimes && (
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Clock className="w-5 h-5" />
-                          Prayer Times
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-1 text-sm">
-                        <div>Fajr: {setupData.prayerTimes.fajr}</div>
-                        <div>Dhuhr: {setupData.prayerTimes.dhuhr}</div>
-                        <div>Asr: {setupData.prayerTimes.asr}</div>
-                        <div>Maghrib: {setupData.prayerTimes.maghrib}</div>
-                        <div>Isha: {setupData.prayerTimes.isha}</div>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
-
-                <div>
-                  <h4 className="font-semibold mb-2">Selected Interests:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {setupData.childInfo.interests.map((interest) => (
-                      <Badge key={interest} variant="secondary">{interest}</Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
+            {renderCurrentStep()}
           </CardContent>
-        </Card>
 
-        {/* Navigation */}
-        <div className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={prevStep}
-            disabled={currentStep === 0}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Previous
-          </Button>
-
-          {currentStep === WIZARD_STEPS.length - 1 ? (
-            <Button onClick={completeSetup} disabled={loading} className="bg-islamic-green hover:bg-islamic-green/90">
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Setting up...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Complete Setup
-                </>
-              )}
-            </Button>
-          ) : (
+          <div className="flex justify-between items-center p-6 bg-muted/30 rounded-b-lg">
             <Button
-              onClick={nextStep}
-              disabled={!canProceed()}
-              className="bg-islamic-green hover:bg-islamic-green/90"
+              variant="outline"
+              onClick={prevStep}
+              disabled={currentStep === 0}
+              className="flex items-center gap-2"
             >
-              Next
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowLeft className="w-4 h-4" />
+              Previous
             </Button>
-          )}
-        </div>
+
+            <div className="flex gap-2">
+              {WIZARD_STEPS.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-3 h-3 rounded-full transition-colors ${
+                    index <= currentStep ? 'bg-islamic-green' : 'bg-muted'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {currentStep === WIZARD_STEPS.length - 1 ? (
+              <Button
+                onClick={completeSetup}
+                disabled={!canProceed() || loading}
+                className="flex items-center gap-2 bg-islamic-green hover:bg-islamic-green/90"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Completing...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    Complete Setup
+                  </>
+                )}
+              </Button>
+            ) : (
+              <Button
+                onClick={nextStep}
+                disabled={!canProceed()}
+                className="flex items-center gap-2"
+              >
+                Next
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        </Card>
       </div>
     </div>
   );

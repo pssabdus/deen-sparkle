@@ -205,6 +205,8 @@ export type Database = {
           gender: string | null
           id: string
           islamic_level: number | null
+          islamic_profile: Json | null
+          learning_schedule: Json | null
           login_email: string | null
           login_password: string | null
           longest_streak: number | null
@@ -225,6 +227,8 @@ export type Database = {
           gender?: string | null
           id?: string
           islamic_level?: number | null
+          islamic_profile?: Json | null
+          learning_schedule?: Json | null
           login_email?: string | null
           login_password?: string | null
           longest_streak?: number | null
@@ -245,6 +249,8 @@ export type Database = {
           gender?: string | null
           id?: string
           islamic_level?: number | null
+          islamic_profile?: Json | null
+          learning_schedule?: Json | null
           login_email?: string | null
           login_password?: string | null
           longest_streak?: number | null
@@ -345,6 +351,7 @@ export type Database = {
           created_at: string | null
           created_by: string
           id: string
+          islamic_settings: Json | null
           name: string
           updated_at: string | null
         }
@@ -352,6 +359,7 @@ export type Database = {
           created_at?: string | null
           created_by: string
           id?: string
+          islamic_settings?: Json | null
           name: string
           updated_at?: string | null
         }
@@ -359,7 +367,44 @@ export type Database = {
           created_at?: string | null
           created_by?: string
           id?: string
+          islamic_settings?: Json | null
           name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      family_islamic_preferences: {
+        Row: {
+          created_at: string | null
+          family_id: string
+          hijri_calendar_preference: Json | null
+          id: string
+          learning_preferences: Json | null
+          prayer_method_id: string | null
+          preferred_language: string | null
+          qibla_direction: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          family_id: string
+          hijri_calendar_preference?: Json | null
+          id?: string
+          learning_preferences?: Json | null
+          prayer_method_id?: string | null
+          preferred_language?: string | null
+          qibla_direction?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          family_id?: string
+          hijri_calendar_preference?: Json | null
+          id?: string
+          learning_preferences?: Json | null
+          prayer_method_id?: string | null
+          preferred_language?: string | null
+          qibla_direction?: number | null
           updated_at?: string | null
         }
         Relationships: []
@@ -473,6 +518,84 @@ export type Database = {
           },
         ]
       }
+      islamic_learning_goals: {
+        Row: {
+          child_id: string
+          created_at: string | null
+          created_by: string | null
+          current_value: number | null
+          deadline: string | null
+          description: string | null
+          goal_type: string
+          id: string
+          priority: string | null
+          status: string | null
+          target_value: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          child_id: string
+          created_at?: string | null
+          created_by?: string | null
+          current_value?: number | null
+          deadline?: string | null
+          description?: string | null
+          goal_type: string
+          id?: string
+          priority?: string | null
+          status?: string | null
+          target_value?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          child_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          current_value?: number | null
+          deadline?: string | null
+          description?: string | null
+          goal_type?: string
+          id?: string
+          priority?: string | null
+          status?: string | null
+          target_value?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      islamic_personality_types: {
+        Row: {
+          companion_type: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          learning_style: Json | null
+          name: string
+          preferred_activities: Json | null
+        }
+        Insert: {
+          companion_type?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          learning_style?: Json | null
+          name: string
+          preferred_activities?: Json | null
+        }
+        Update: {
+          companion_type?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          learning_style?: Json | null
+          name?: string
+          preferred_activities?: Json | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           action_url: string | null
@@ -516,6 +639,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      prayer_calculation_methods: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_default: boolean | null
+          name: string
+          parameters: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          name: string
+          parameters?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          parameters?: Json | null
+        }
+        Relationships: []
       }
       prayer_times: {
         Row: {
@@ -938,6 +1088,10 @@ export type Database = {
       }
       get_child_analytics: {
         Args: { child_id: string }
+        Returns: Json
+      }
+      get_child_islamic_analytics: {
+        Args: { child_uuid: string }
         Returns: Json
       }
       get_child_prayer_completion_rate: {
