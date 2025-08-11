@@ -69,16 +69,14 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
 
       if (authError) throw authError;
 
-      // Create user record in users table with 'child' role
+      // Update user record with correct role and family_id (trigger creates basic record)
       const { error: userError } = await supabase
         .from('users')
-        .insert({
-          id: authData.user?.id,
-          email: childEmail,
-          full_name: newChild.name,
+        .update({
           role: 'child',
           family_id: familyId
-        });
+        })
+        .eq('id', authData.user?.id);
 
       if (userError) throw userError;
 
