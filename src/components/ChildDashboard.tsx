@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Star, Flame, Book, Heart, Gift, LogOut, Award, Calendar, MessageCircle } from 'lucide-react';
+import { Star, Flame, Book, Heart, Gift, LogOut, Award, Calendar, MessageCircle, Gamepad2 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import PrayerTracker from '@/components/PrayerTracker';
 import StoryReader from '@/components/StoryReader';
@@ -16,6 +16,7 @@ import IslamicCompanion from '@/components/IslamicCompanion';
 import StreakTracker from '@/components/StreakTracker';
 import IslamicAIChat from '@/components/IslamicAIChat';
 import InteractiveIslamicCompanion from '@/components/InteractiveIslamicCompanion';
+import IslamicLearningGames from '@/components/IslamicLearningGames';
 
 interface UserProfile {
   id: string;
@@ -219,8 +220,12 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="activities" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="activities">Activities</TabsTrigger>
+            <TabsTrigger value="games">
+              <Gamepad2 className="w-4 h-4 mr-1" />
+              Games
+            </TabsTrigger>
             <TabsTrigger value="badges">Badges</TabsTrigger>
             <TabsTrigger value="streaks">Streaks</TabsTrigger>
             <TabsTrigger value="stories">Stories</TabsTrigger>
@@ -277,6 +282,13 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="games">
+            <IslamicLearningGames 
+              childId={childProfile.id}
+              userProfile={childProfile}
+            />
           </TabsContent>
 
           <TabsContent value="badges">
