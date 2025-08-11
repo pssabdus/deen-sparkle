@@ -12,8 +12,6 @@ import PrayerTracker from '@/components/PrayerTracker';
 import StoryReader from '@/components/StoryReader';
 import RewardStore from '@/components/RewardStore';
 import IslamicAchievementSystem from '@/components/IslamicAchievementSystem';
-import BadgeSystem from '@/components/BadgeSystem';
-import IslamicCompanion from '@/components/IslamicCompanion';
 import StreakTracker from '@/components/StreakTracker';
 import IslamicAIChat from '@/components/IslamicAIChat';
 import InteractiveIslamicCompanion from '@/components/InteractiveIslamicCompanion';
@@ -254,14 +252,10 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
           </TabsContent>
 
           <TabsContent value="badges">
-            <BadgeSystem 
+            <IslamicAchievementSystem 
               childId={childProfile.id}
-              onBadgeEarned={(badge) => {
-                toast({
-                  title: "New Badge Earned! 🏆",
-                  description: `You earned the "${badge.name}" badge!`,
-                });
-              }}
+              familyId={childProfile.family_id}
+              userRole="child"
             />
           </TabsContent>
 

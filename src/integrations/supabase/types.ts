@@ -75,6 +75,55 @@ export type Database = {
           },
         ]
       }
+      ai_achievement_suggestions: {
+        Row: {
+          child_id: string
+          created_at: string
+          family_id: string
+          id: string
+          implemented: boolean | null
+          suggestion_data: Json
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          family_id: string
+          id?: string
+          implemented?: boolean | null
+          suggestion_data: Json
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          family_id?: string
+          id?: string
+          implemented?: boolean | null
+          suggestion_data?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_achievement_suggestions_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "child_analytics_view"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "ai_achievement_suggestions_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_achievement_suggestions_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_settings: {
         Row: {
           created_at: string | null
@@ -186,6 +235,64 @@ export type Database = {
           },
           {
             foreignKeyName: "child_badges_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      child_islamic_milestones: {
+        Row: {
+          achievement_id: string
+          celebration_viewed: boolean | null
+          child_id: string
+          created_at: string
+          earned_at: string | null
+          id: string
+          notes: string | null
+          progress_percentage: number | null
+          updated_at: string
+        }
+        Insert: {
+          achievement_id: string
+          celebration_viewed?: boolean | null
+          child_id: string
+          created_at?: string
+          earned_at?: string | null
+          id?: string
+          notes?: string | null
+          progress_percentage?: number | null
+          updated_at?: string
+        }
+        Update: {
+          achievement_id?: string
+          celebration_viewed?: boolean | null
+          child_id?: string
+          created_at?: string
+          earned_at?: string | null
+          id?: string
+          notes?: string | null
+          progress_percentage?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "child_islamic_milestones_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "islamic_achievements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "child_islamic_milestones_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "child_analytics_view"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "child_islamic_milestones_child_id_fkey"
             columns: ["child_id"]
             isOneToOne: false
             referencedRelation: "children"
@@ -372,6 +479,68 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      family_islamic_challenges: {
+        Row: {
+          challenge_type: string
+          created_at: string
+          created_by_ai: boolean | null
+          description: string
+          educational_content: Json | null
+          end_date: string
+          family_id: string
+          goals: Json | null
+          id: string
+          is_active: boolean | null
+          name_arabic: string | null
+          name_english: string
+          start_date: string
+          success_celebration: Json | null
+          updated_at: string
+        }
+        Insert: {
+          challenge_type: string
+          created_at?: string
+          created_by_ai?: boolean | null
+          description: string
+          educational_content?: Json | null
+          end_date: string
+          family_id: string
+          goals?: Json | null
+          id?: string
+          is_active?: boolean | null
+          name_arabic?: string | null
+          name_english: string
+          start_date: string
+          success_celebration?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          challenge_type?: string
+          created_at?: string
+          created_by_ai?: boolean | null
+          description?: string
+          educational_content?: Json | null
+          end_date?: string
+          family_id?: string
+          goals?: Json | null
+          id?: string
+          is_active?: boolean | null
+          name_arabic?: string | null
+          name_english?: string
+          start_date?: string
+          success_celebration?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_islamic_challenges_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       family_islamic_preferences: {
         Row: {
@@ -562,6 +731,175 @@ export type Database = {
           },
         ]
       }
+      islamic_achievement_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          name_arabic: string
+          name_english: string
+          name_transliteration: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon: string
+          id?: string
+          name_arabic: string
+          name_english: string
+          name_transliteration: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          name_arabic?: string
+          name_english?: string
+          name_transliteration?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      islamic_achievement_criteria: {
+        Row: {
+          achievement_id: string
+          comparison_operator: string | null
+          created_at: string
+          criterion_type: string
+          id: string
+          target_value: number
+        }
+        Insert: {
+          achievement_id: string
+          comparison_operator?: string | null
+          created_at?: string
+          criterion_type: string
+          id?: string
+          target_value: number
+        }
+        Update: {
+          achievement_id?: string
+          comparison_operator?: string | null
+          created_at?: string
+          criterion_type?: string
+          id?: string
+          target_value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "islamic_achievement_criteria_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "islamic_achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      islamic_achievements: {
+        Row: {
+          age_maximum: number | null
+          age_minimum: number | null
+          category_id: string
+          celebration_dua: string | null
+          celebration_dua_translation: string | null
+          created_at: string
+          description_arabic: string | null
+          description_english: string
+          difficulty_level: number | null
+          id: string
+          name_arabic: string
+          name_english: string
+          name_transliteration: string
+          points_reward: number | null
+          required_actions: Json | null
+          updated_at: string
+        }
+        Insert: {
+          age_maximum?: number | null
+          age_minimum?: number | null
+          category_id: string
+          celebration_dua?: string | null
+          celebration_dua_translation?: string | null
+          created_at?: string
+          description_arabic?: string | null
+          description_english: string
+          difficulty_level?: number | null
+          id?: string
+          name_arabic: string
+          name_english: string
+          name_transliteration: string
+          points_reward?: number | null
+          required_actions?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          age_maximum?: number | null
+          age_minimum?: number | null
+          category_id?: string
+          celebration_dua?: string | null
+          celebration_dua_translation?: string | null
+          created_at?: string
+          description_arabic?: string | null
+          description_english?: string
+          difficulty_level?: number | null
+          id?: string
+          name_arabic?: string
+          name_english?: string
+          name_transliteration?: string
+          points_reward?: number | null
+          required_actions?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "islamic_achievements_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "islamic_achievement_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      islamic_celebrations: {
+        Row: {
+          animation_type: string | null
+          created_at: string
+          dua_arabic: string
+          dua_translation: string
+          id: string
+          name: string
+          occasion_type: string | null
+          sound_effect: string | null
+        }
+        Insert: {
+          animation_type?: string | null
+          created_at?: string
+          dua_arabic: string
+          dua_translation: string
+          id?: string
+          name: string
+          occasion_type?: string | null
+          sound_effect?: string | null
+        }
+        Update: {
+          animation_type?: string | null
+          created_at?: string
+          dua_arabic?: string
+          dua_translation?: string
+          id?: string
+          name?: string
+          occasion_type?: string | null
+          sound_effect?: string | null
+        }
+        Relationships: []
+      }
       islamic_educators: {
         Row: {
           approval_level: string | null
@@ -724,6 +1062,39 @@ export type Database = {
           status?: string | null
           target_age_group?: string
           title?: string
+        }
+        Relationships: []
+      }
+      islamic_terminology: {
+        Row: {
+          arabic_term: string
+          category: string
+          created_at: string
+          english_translation: string
+          explanation: string
+          id: string
+          transliteration: string
+          updated_at: string
+        }
+        Insert: {
+          arabic_term: string
+          category: string
+          created_at?: string
+          english_translation: string
+          explanation: string
+          id?: string
+          transliteration: string
+          updated_at?: string
+        }
+        Update: {
+          arabic_term?: string
+          category?: string
+          created_at?: string
+          english_translation?: string
+          explanation?: string
+          id?: string
+          transliteration?: string
+          updated_at?: string
         }
         Relationships: []
       }

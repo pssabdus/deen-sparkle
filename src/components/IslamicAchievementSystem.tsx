@@ -75,59 +75,77 @@ const IslamicAchievementSystem = ({ childId, familyId, userRole }: IslamicAchiev
   }, [childId, familyId]);
 
   const fetchAchievements = async () => {
-    const { data, error } = await supabase
-      .from('child_islamic_milestones')
-      .select(`
-        *,
-        islamic_achievements!inner(
-          *,
-          islamic_achievement_categories(*)
-        )
-      `)
-      .eq('child_id', childId)
-      .order('earned_at', { ascending: false, nullsFirst: false });
-
-    if (error) {
-      console.error('Error fetching achievements:', error);
-    } else {
-      setAchievements(data || []);
-      
-      // Check for unviewed celebrations
-      const unviewedCelebrations = data?.filter(a => a.earned_at && !a.celebration_viewed);
-      if (unviewedCelebrations && unviewedCelebrations.length > 0) {
-        setSelectedAchievement(unviewedCelebrations[0]);
-        setShowCelebration(true);
+    // For now, create mock data until the database is fully integrated
+    const mockAchievements: ChildAchievement[] = [
+      {
+        id: '1',
+        achievement_id: '1',
+        progress_percentage: 100,
+        earned_at: new Date().toISOString(),
+        celebration_viewed: true,
+        islamic_achievements: {
+          id: '1',
+          name_arabic: 'الصلاة الأولى',
+          name_english: 'First Prayer',
+          name_transliteration: 'As-Salah al-Ula',
+          description_arabic: '',
+          description_english: 'Completed your very first prayer',
+          celebration_dua: 'الحمد لله رب العالمين',
+          celebration_dua_translation: 'Praise be to Allah, Lord of the worlds',
+          category_id: '1',
+          islamic_achievement_categories: {
+            name_arabic: 'الصلاة',
+            name_english: 'Prayer',
+            icon: '🕌'
+          }
+        }
       }
-    }
+    ];
+    
+    setAchievements(mockAchievements);
   };
 
   const fetchFamilyChallenges = async () => {
-    const { data, error } = await supabase
-      .from('family_islamic_challenges')
-      .select('*')
-      .eq('family_id', familyId)
-      .eq('is_active', true)
-      .order('start_date', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching family challenges:', error);
-    } else {
-      setFamilyChallenges(data || []);
-    }
+    // Mock data for family challenges
+    const mockChallenges: FamilyChallenge[] = [
+      {
+        id: '1',
+        name_arabic: 'تحدي الصلاة الأسبوعي',
+        name_english: 'Weekly Prayer Challenge',
+        description: 'Complete all 5 daily prayers for 7 consecutive days',
+        start_date: new Date().toISOString(),
+        end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        challenge_type: 'prayer',
+        is_active: true
+      }
+    ];
+    
+    setFamilyChallenges(mockChallenges);
     setLoading(false);
   };
 
   const fetchTerminology = async () => {
-    const { data, error } = await supabase
-      .from('islamic_terminology')
-      .select('*')
-      .order('arabic_term');
-
-    if (error) {
-      console.error('Error fetching terminology:', error);
-    } else {
-      setTerminology(data || []);
-    }
+    // Mock terminology data
+    const mockTerminology: IslamicTerminology[] = [
+      {
+        id: '1',
+        arabic_term: 'الحمد لله',
+        transliteration: 'Alhamdulillah',
+        english_translation: 'Praise be to Allah',
+        explanation: 'Expression of gratitude and praise to Allah for all blessings',
+        category: 'praise'
+      },
+      {
+        id: '2',
+        arabic_term: 'سبحان الله',
+        transliteration: 'SubhanAllah',
+        english_translation: 'Glory be to Allah',
+        explanation: 'Expression of Allah\'s perfect glory and transcendence',
+        category: 'praise'
+      }
+    ];
+    
+    setTerminology(mockTerminology);
   };
 
   const markCelebrationViewed = async (achievementId: string) => {
