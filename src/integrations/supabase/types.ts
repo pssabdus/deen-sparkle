@@ -297,6 +297,72 @@ export type Database = {
           },
         ]
       }
+      child_islamic_analytics: {
+        Row: {
+          ai_insights: Json | null
+          analysis_date: string | null
+          areas_for_improvement: Json | null
+          child_id: string
+          created_at: string | null
+          engagement_metrics: Json
+          id: string
+          knowledge_retention_rate: number | null
+          learning_patterns: Json
+          optimal_activity_suggestions: Json | null
+          practice_consistency_score: number | null
+          preferred_learning_times: Json | null
+          recommended_interventions: Json | null
+          reviewed_by_scholar: string | null
+          scholar_notes: string | null
+          scholar_review_status: string | null
+          spiritual_development_score: number | null
+          strengths_identified: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          ai_insights?: Json | null
+          analysis_date?: string | null
+          areas_for_improvement?: Json | null
+          child_id: string
+          created_at?: string | null
+          engagement_metrics: Json
+          id?: string
+          knowledge_retention_rate?: number | null
+          learning_patterns: Json
+          optimal_activity_suggestions?: Json | null
+          practice_consistency_score?: number | null
+          preferred_learning_times?: Json | null
+          recommended_interventions?: Json | null
+          reviewed_by_scholar?: string | null
+          scholar_notes?: string | null
+          scholar_review_status?: string | null
+          spiritual_development_score?: number | null
+          strengths_identified?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          ai_insights?: Json | null
+          analysis_date?: string | null
+          areas_for_improvement?: Json | null
+          child_id?: string
+          created_at?: string | null
+          engagement_metrics?: Json
+          id?: string
+          knowledge_retention_rate?: number | null
+          learning_patterns?: Json
+          optimal_activity_suggestions?: Json | null
+          practice_consistency_score?: number | null
+          preferred_learning_times?: Json | null
+          recommended_interventions?: Json | null
+          reviewed_by_scholar?: string | null
+          scholar_notes?: string | null
+          scholar_review_status?: string | null
+          spiritual_development_score?: number | null
+          strengths_identified?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       child_islamic_milestones: {
         Row: {
           achievement_id: string
@@ -1356,6 +1422,141 @@ export type Database = {
         }
         Relationships: []
       }
+      islamic_curriculum_standards: {
+        Row: {
+          akhlaq_development: Json | null
+          approval_date: string | null
+          approved_by: string | null
+          aqeedah_components: Json | null
+          assessment_rubric: Json
+          created_at: string | null
+          cross_curricular_connections: Json | null
+          cultural_adaptations: Json | null
+          fiqh_elements: Json | null
+          grade_level: number
+          hadith_foundations: Json | null
+          id: string
+          international_alignment: string | null
+          learning_objective: string
+          local_community_input: Json | null
+          progression_pathway: Json | null
+          quranic_foundations: Json | null
+          scholar_approved: boolean | null
+          skill_competencies: Json
+          standard_name: string
+          subject_area: string
+          updated_at: string | null
+        }
+        Insert: {
+          akhlaq_development?: Json | null
+          approval_date?: string | null
+          approved_by?: string | null
+          aqeedah_components?: Json | null
+          assessment_rubric: Json
+          created_at?: string | null
+          cross_curricular_connections?: Json | null
+          cultural_adaptations?: Json | null
+          fiqh_elements?: Json | null
+          grade_level: number
+          hadith_foundations?: Json | null
+          id?: string
+          international_alignment?: string | null
+          learning_objective: string
+          local_community_input?: Json | null
+          progression_pathway?: Json | null
+          quranic_foundations?: Json | null
+          scholar_approved?: boolean | null
+          skill_competencies: Json
+          standard_name: string
+          subject_area: string
+          updated_at?: string | null
+        }
+        Update: {
+          akhlaq_development?: Json | null
+          approval_date?: string | null
+          approved_by?: string | null
+          aqeedah_components?: Json | null
+          assessment_rubric?: Json
+          created_at?: string | null
+          cross_curricular_connections?: Json | null
+          cultural_adaptations?: Json | null
+          fiqh_elements?: Json | null
+          grade_level?: number
+          hadith_foundations?: Json | null
+          id?: string
+          international_alignment?: string | null
+          learning_objective?: string
+          local_community_input?: Json | null
+          progression_pathway?: Json | null
+          quranic_foundations?: Json | null
+          scholar_approved?: boolean | null
+          skill_competencies?: Json
+          standard_name?: string
+          subject_area?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      islamic_education_scholars: {
+        Row: {
+          bio: string | null
+          certifications: Json | null
+          contact_email: string | null
+          created_at: string | null
+          credentials: string
+          educational_background: string | null
+          id: string
+          is_active: boolean | null
+          islamic_methodology_expertise: string | null
+          languages_spoken: Json | null
+          scholar_name: string
+          scholarly_works: Json | null
+          specializations: Json | null
+          updated_at: string | null
+          user_id: string
+          verification_status: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          bio?: string | null
+          certifications?: Json | null
+          contact_email?: string | null
+          created_at?: string | null
+          credentials: string
+          educational_background?: string | null
+          id?: string
+          is_active?: boolean | null
+          islamic_methodology_expertise?: string | null
+          languages_spoken?: Json | null
+          scholar_name: string
+          scholarly_works?: Json | null
+          specializations?: Json | null
+          updated_at?: string | null
+          user_id: string
+          verification_status?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          bio?: string | null
+          certifications?: Json | null
+          contact_email?: string | null
+          created_at?: string | null
+          credentials?: string
+          educational_background?: string | null
+          id?: string
+          is_active?: boolean | null
+          islamic_methodology_expertise?: string | null
+          languages_spoken?: Json | null
+          scholar_name?: string
+          scholarly_works?: Json | null
+          specializations?: Json | null
+          updated_at?: string | null
+          user_id?: string
+          verification_status?: string | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
       islamic_educators: {
         Row: {
           approval_level: string | null
@@ -1510,6 +1711,135 @@ export type Database = {
         }
         Relationships: []
       }
+      islamic_intervention_strategies: {
+        Row: {
+          created_at: string | null
+          cultural_sensitivity_notes: string | null
+          duration_guidelines: string | null
+          effectiveness_metrics: Json | null
+          expected_outcomes: Json | null
+          family_involvement_required: boolean | null
+          hadith_basis: Json | null
+          id: string
+          implementation_steps: Json
+          islamic_methodology: string
+          quranic_basis: Json | null
+          scholar_validated: boolean | null
+          scholarly_references: Json | null
+          strategy_description: string
+          strategy_name: string
+          success_rate: number | null
+          target_age_group: string
+          trigger_conditions: Json
+          updated_at: string | null
+          usage_frequency: number | null
+          validated_by: string | null
+          validation_date: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          cultural_sensitivity_notes?: string | null
+          duration_guidelines?: string | null
+          effectiveness_metrics?: Json | null
+          expected_outcomes?: Json | null
+          family_involvement_required?: boolean | null
+          hadith_basis?: Json | null
+          id?: string
+          implementation_steps: Json
+          islamic_methodology: string
+          quranic_basis?: Json | null
+          scholar_validated?: boolean | null
+          scholarly_references?: Json | null
+          strategy_description: string
+          strategy_name: string
+          success_rate?: number | null
+          target_age_group: string
+          trigger_conditions: Json
+          updated_at?: string | null
+          usage_frequency?: number | null
+          validated_by?: string | null
+          validation_date?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          cultural_sensitivity_notes?: string | null
+          duration_guidelines?: string | null
+          effectiveness_metrics?: Json | null
+          expected_outcomes?: Json | null
+          family_involvement_required?: boolean | null
+          hadith_basis?: Json | null
+          id?: string
+          implementation_steps?: Json
+          islamic_methodology?: string
+          quranic_basis?: Json | null
+          scholar_validated?: boolean | null
+          scholarly_references?: Json | null
+          strategy_description?: string
+          strategy_name?: string
+          success_rate?: number | null
+          target_age_group?: string
+          trigger_conditions?: Json
+          updated_at?: string | null
+          usage_frequency?: number | null
+          validated_by?: string | null
+          validation_date?: string | null
+        }
+        Relationships: []
+      }
+      islamic_learning_benchmarks: {
+        Row: {
+          age_group: string
+          assessment_criteria: Json
+          benchmark_description: string
+          benchmark_name: string
+          created_at: string | null
+          created_by_scholar: string | null
+          cultural_considerations: Json | null
+          expected_competency_level: number
+          hadith_references: Json | null
+          id: string
+          islamic_subject: string
+          quranic_references: Json | null
+          scholarly_sources: Json | null
+          updated_at: string | null
+          validation_status: string | null
+        }
+        Insert: {
+          age_group: string
+          assessment_criteria: Json
+          benchmark_description: string
+          benchmark_name: string
+          created_at?: string | null
+          created_by_scholar?: string | null
+          cultural_considerations?: Json | null
+          expected_competency_level: number
+          hadith_references?: Json | null
+          id?: string
+          islamic_subject: string
+          quranic_references?: Json | null
+          scholarly_sources?: Json | null
+          updated_at?: string | null
+          validation_status?: string | null
+        }
+        Update: {
+          age_group?: string
+          assessment_criteria?: Json
+          benchmark_description?: string
+          benchmark_name?: string
+          created_at?: string | null
+          created_by_scholar?: string | null
+          cultural_considerations?: Json | null
+          expected_competency_level?: number
+          hadith_references?: Json | null
+          id?: string
+          islamic_subject?: string
+          quranic_references?: Json | null
+          scholarly_sources?: Json | null
+          updated_at?: string | null
+          validation_status?: string | null
+        }
+        Relationships: []
+      }
       islamic_learning_goals: {
         Row: {
           child_id: string
@@ -1554,6 +1884,84 @@ export type Database = {
           status?: string | null
           target_value?: number | null
           title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      islamic_learning_paths: {
+        Row: {
+          age_appropriate: boolean | null
+          assessment_methods: Json | null
+          character_traits_focus: Json | null
+          child_id: string
+          created_at: string | null
+          created_by_ai: boolean | null
+          cultural_adaptations: Json | null
+          curriculum_modules: Json
+          difficulty_level: number | null
+          estimated_duration_weeks: number | null
+          family_involvement_level: string | null
+          hadith_studies_focus: Json | null
+          id: string
+          learning_objectives: Json
+          path_description: string | null
+          path_name: string
+          practical_applications: Json | null
+          prerequisite_skills: Json | null
+          progression_milestones: Json | null
+          quranic_verses_focus: Json | null
+          reviewed_by_scholar: string | null
+          scholar_approval_status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          age_appropriate?: boolean | null
+          assessment_methods?: Json | null
+          character_traits_focus?: Json | null
+          child_id: string
+          created_at?: string | null
+          created_by_ai?: boolean | null
+          cultural_adaptations?: Json | null
+          curriculum_modules: Json
+          difficulty_level?: number | null
+          estimated_duration_weeks?: number | null
+          family_involvement_level?: string | null
+          hadith_studies_focus?: Json | null
+          id?: string
+          learning_objectives: Json
+          path_description?: string | null
+          path_name: string
+          practical_applications?: Json | null
+          prerequisite_skills?: Json | null
+          progression_milestones?: Json | null
+          quranic_verses_focus?: Json | null
+          reviewed_by_scholar?: string | null
+          scholar_approval_status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          age_appropriate?: boolean | null
+          assessment_methods?: Json | null
+          character_traits_focus?: Json | null
+          child_id?: string
+          created_at?: string | null
+          created_by_ai?: boolean | null
+          cultural_adaptations?: Json | null
+          curriculum_modules?: Json
+          difficulty_level?: number | null
+          estimated_duration_weeks?: number | null
+          family_involvement_level?: string | null
+          hadith_studies_focus?: Json | null
+          id?: string
+          learning_objectives?: Json
+          path_description?: string | null
+          path_name?: string
+          practical_applications?: Json | null
+          prerequisite_skills?: Json | null
+          progression_milestones?: Json | null
+          quranic_verses_focus?: Json | null
+          reviewed_by_scholar?: string | null
+          scholar_approval_status?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -1633,6 +2041,84 @@ export type Database = {
           learning_style?: Json | null
           name?: string
           preferred_activities?: Json | null
+        }
+        Relationships: []
+      }
+      islamic_progress_reports: {
+        Row: {
+          character_development_insights: Json
+          child_id: string
+          created_at: string | null
+          cultural_considerations: Json | null
+          family_guidance_suggestions: Json | null
+          generated_by_ai: boolean | null
+          hadith_recommendations: Json | null
+          id: string
+          islamic_values_application: Json | null
+          knowledge_acquisition_summary: Json
+          next_period_goals: Json | null
+          overall_progress_score: number | null
+          parent_feedback: Json | null
+          prayer_consistency_analysis: Json | null
+          quran_memorization_progress: Json | null
+          quranic_recommendations: Json | null
+          recommended_improvements: Json | null
+          report_period_end: string
+          report_period_start: string
+          reviewed_by_scholar: string | null
+          scholar_insights: string | null
+          spiritual_growth_assessment: Json
+          updated_at: string | null
+        }
+        Insert: {
+          character_development_insights: Json
+          child_id: string
+          created_at?: string | null
+          cultural_considerations?: Json | null
+          family_guidance_suggestions?: Json | null
+          generated_by_ai?: boolean | null
+          hadith_recommendations?: Json | null
+          id?: string
+          islamic_values_application?: Json | null
+          knowledge_acquisition_summary: Json
+          next_period_goals?: Json | null
+          overall_progress_score?: number | null
+          parent_feedback?: Json | null
+          prayer_consistency_analysis?: Json | null
+          quran_memorization_progress?: Json | null
+          quranic_recommendations?: Json | null
+          recommended_improvements?: Json | null
+          report_period_end: string
+          report_period_start: string
+          reviewed_by_scholar?: string | null
+          scholar_insights?: string | null
+          spiritual_growth_assessment: Json
+          updated_at?: string | null
+        }
+        Update: {
+          character_development_insights?: Json
+          child_id?: string
+          created_at?: string | null
+          cultural_considerations?: Json | null
+          family_guidance_suggestions?: Json | null
+          generated_by_ai?: boolean | null
+          hadith_recommendations?: Json | null
+          id?: string
+          islamic_values_application?: Json | null
+          knowledge_acquisition_summary?: Json
+          next_period_goals?: Json | null
+          overall_progress_score?: number | null
+          parent_feedback?: Json | null
+          prayer_consistency_analysis?: Json | null
+          quran_memorization_progress?: Json | null
+          quranic_recommendations?: Json | null
+          recommended_improvements?: Json | null
+          report_period_end?: string
+          report_period_start?: string
+          reviewed_by_scholar?: string | null
+          scholar_insights?: string | null
+          spiritual_growth_assessment?: Json
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -2170,6 +2656,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      scholar_review_submissions: {
+        Row: {
+          age_appropriateness_score: number | null
+          ai_generated_insights: Json | null
+          approval_status: string | null
+          assigned_scholar: string | null
+          child_id: string
+          cultural_adjustments: Json | null
+          educational_value_score: number | null
+          final_recommendations: Json | null
+          id: string
+          islamic_authenticity_score: number | null
+          review_priority: string | null
+          review_status: string | null
+          reviewed_at: string | null
+          revision_requests: Json | null
+          scholar_review_notes: string | null
+          submission_data: Json
+          submission_id: string
+          submission_type: string
+          submitted_at: string | null
+          submitted_by: string
+          updated_at: string | null
+        }
+        Insert: {
+          age_appropriateness_score?: number | null
+          ai_generated_insights?: Json | null
+          approval_status?: string | null
+          assigned_scholar?: string | null
+          child_id: string
+          cultural_adjustments?: Json | null
+          educational_value_score?: number | null
+          final_recommendations?: Json | null
+          id?: string
+          islamic_authenticity_score?: number | null
+          review_priority?: string | null
+          review_status?: string | null
+          reviewed_at?: string | null
+          revision_requests?: Json | null
+          scholar_review_notes?: string | null
+          submission_data: Json
+          submission_id: string
+          submission_type: string
+          submitted_at?: string | null
+          submitted_by: string
+          updated_at?: string | null
+        }
+        Update: {
+          age_appropriateness_score?: number | null
+          ai_generated_insights?: Json | null
+          approval_status?: string | null
+          assigned_scholar?: string | null
+          child_id?: string
+          cultural_adjustments?: Json | null
+          educational_value_score?: number | null
+          final_recommendations?: Json | null
+          id?: string
+          islamic_authenticity_score?: number | null
+          review_priority?: string | null
+          review_status?: string | null
+          reviewed_at?: string | null
+          revision_requests?: Json | null
+          scholar_review_notes?: string | null
+          submission_data?: Json
+          submission_id?: string
+          submission_type?: string
+          submitted_at?: string | null
+          submitted_by?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       stories: {
         Row: {
