@@ -19,7 +19,8 @@ import IslamicLearningGames from '@/components/IslamicLearningGames';
 import IslamicPrayerManager from '@/components/IslamicPrayerManager';
 import IslamicMotivationSystem from '@/components/IslamicMotivationSystem';
 import IslamicFamilySocialSystem from '@/components/IslamicFamilySocialSystem';
-import ChildGoalsView from '@/components/ChildGoalsView';
+import GoalsTracker from '@/components/GoalsTracker';
+
 
 interface UserProfile {
   id: string;
@@ -223,7 +224,7 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="activities" className="w-full">
-          <TabsList className="grid w-full grid-cols-10">
+          <TabsList className="grid w-full grid-cols-9">
             <TabsTrigger value="activities">Activities</TabsTrigger>
             <TabsTrigger value="goals">
               <Target className="w-4 h-4 mr-1" />
@@ -260,10 +261,7 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
           </TabsContent>
 
           <TabsContent value="goals">
-            <ChildGoalsView 
-              childId={childProfile.id}
-              familyId={childProfile.family_id}
-            />
+            <GoalsTracker childId={childProfile.id} />
           </TabsContent>
 
           <TabsContent value="games">
