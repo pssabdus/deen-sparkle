@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Star, Flame, Book, Heart, Gift, LogOut, Award, Calendar, MessageCircle, Gamepad2, Users } from 'lucide-react';
+import { Star, Flame, Book, Heart, Gift, LogOut, Award, Calendar, MessageCircle, Gamepad2, Users, Target } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import PrayerTracker from '@/components/PrayerTracker';
 import StoryReader from '@/components/StoryReader';
@@ -19,6 +19,7 @@ import IslamicLearningGames from '@/components/IslamicLearningGames';
 import IslamicPrayerManager from '@/components/IslamicPrayerManager';
 import IslamicMotivationSystem from '@/components/IslamicMotivationSystem';
 import IslamicFamilySocialSystem from '@/components/IslamicFamilySocialSystem';
+import ChildGoalsView from '@/components/ChildGoalsView';
 
 interface UserProfile {
   id: string;
@@ -222,8 +223,12 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="activities" className="w-full">
-          <TabsList className="grid w-full grid-cols-9">
+          <TabsList className="grid w-full grid-cols-10">
             <TabsTrigger value="activities">Activities</TabsTrigger>
+            <TabsTrigger value="goals">
+              <Target className="w-4 h-4 mr-1" />
+              Goals
+            </TabsTrigger>
             <TabsTrigger value="games">
               <Gamepad2 className="w-4 h-4 mr-1" />
               Games
@@ -251,6 +256,13 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
             <IslamicPrayerManager 
               childId={childProfile.id}
               userProfile={childProfile}
+            />
+          </TabsContent>
+
+          <TabsContent value="goals">
+            <ChildGoalsView 
+              childId={childProfile.id}
+              familyId={childProfile.family_id}
             />
           </TabsContent>
 

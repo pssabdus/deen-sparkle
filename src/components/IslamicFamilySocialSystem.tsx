@@ -28,6 +28,7 @@ import FamilyStoryTime from './family-features/FamilyStoryTime';
 import CollaborativeGoals from './family-features/CollaborativeGoals';
 import FamilyIslamicCalendar from './family-features/FamilyIslamicCalendar';
 import IslamicFamilyChat from './family-features/IslamicFamilyChat';
+import IslamicStoryGenerator from './IslamicStoryGenerator';
 
 interface FamilySocialSystemProps {
   familyId: string;
@@ -210,7 +211,7 @@ const IslamicFamilySocialSystem = ({
         </CardHeader>
         <CardContent>
           <Tabs value={selectedFeature} onValueChange={setSelectedFeature} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
+            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="prayer-sync">
                 <Clock className="w-4 h-4 mr-1" />
@@ -231,6 +232,10 @@ const IslamicFamilySocialSystem = ({
               <TabsTrigger value="stories">
                 <Mic className="w-4 h-4 mr-1" />
                 Stories
+              </TabsTrigger>
+              <TabsTrigger value="story-ai">
+                <Sparkles className="w-4 h-4 mr-1" />
+                AI Generator
               </TabsTrigger>
               <TabsTrigger value="chat">
                 <MessageCircle className="w-4 h-4 mr-1" />
@@ -354,6 +359,27 @@ const IslamicFamilySocialSystem = ({
                 userId={userId}
                 childrenData={childrenData}
               />
+            </TabsContent>
+
+            <TabsContent value="story-ai">
+              {userRole === 'parent' && childrenData.length > 0 ? (
+                <IslamicStoryGenerator
+                  childId={childrenData[0]?.id || ''}
+                  familyId={familyId}
+                  onStoryGenerated={(story) => {
+                    toast({
+                      title: "Story Generated! 📚",
+                      description: "Your Islamic story has been created and sent for review.",
+                    });
+                  }}
+                />
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">
+                    Story generation is available for parents with children.
+                  </p>
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="chat">
