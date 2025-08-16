@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Setup from "./pages/Setup";
 import NotFound from "./pages/NotFound";
+import ChildGoalManager from "./pages/ChildGoalManager";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/auth" element={<Layout requireAuth={false}><Auth /></Layout>} />
             <Route path="/setup" element={<Layout requireAuth={false}><Setup /></Layout>} />
             <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
+            <Route path="/child/:childId/goals" element={<Layout><ChildGoalManager /></Layout>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

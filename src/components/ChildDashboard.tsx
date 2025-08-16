@@ -16,7 +16,7 @@ import StreakTracker from '@/components/StreakTracker';
 import IslamicAIChat from '@/components/IslamicAIChat';
 import InteractiveIslamicCompanion from '@/components/InteractiveIslamicCompanion';
 import IslamicLearningGames from '@/components/IslamicLearningGames';
-import IslamicPrayerManager from '@/components/IslamicPrayerManager';
+import SimplePrayerTracker from '@/components/SimplePrayerTracker';
 import IslamicMotivationSystem from '@/components/IslamicMotivationSystem';
 import IslamicFamilySocialSystem from '@/components/IslamicFamilySocialSystem';
 import GoalsTracker from '@/components/GoalsTracker';
@@ -253,11 +253,8 @@ const ChildDashboard = ({ userProfile }: ChildDashboardProps) => {
           </TabsList>
 
           <TabsContent value="activities" className="space-y-6">
-            {/* Islamic Prayer Management System */}
-            <IslamicPrayerManager 
-              childId={childProfile.id}
-              userProfile={childProfile}
-            />
+            {/* Simple Prayer Tracker */}
+            <SimplePrayerTracker childId={childProfile.id} />
           </TabsContent>
 
           <TabsContent value="goals">

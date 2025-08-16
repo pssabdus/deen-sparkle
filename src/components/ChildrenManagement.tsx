@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Plus, User, Calendar, Star, Flame, Eye, EyeOff, RefreshCw, Mail, Lock, Copy, Settings } from 'lucide-react';
+import { Plus, User, Calendar, Star, Flame, Eye, EyeOff, RefreshCw, Mail, Lock, Copy, Settings, Target } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -423,11 +423,20 @@ const ChildrenManagement = ({ children, onChildrenUpdate, familyId }: ChildrenMa
                     <span className="font-semibold">{child.current_streak} days</span>
                   </div>
 
-                  <div className="pt-2 border-t">
-                    <p className="text-xs text-muted-foreground">
-                      Companion: {child.companion_name} {getCompanionEmoji(child.companion_type)}
-                    </p>
-                  </div>
+                   <div className="pt-2 border-t">
+                     <p className="text-xs text-muted-foreground">
+                       Companion: {child.companion_name} {getCompanionEmoji(child.companion_type)}
+                     </p>
+                     <Button 
+                       variant="outline" 
+                       size="sm" 
+                       className="w-full mt-2"
+                       onClick={() => navigate(`/child/${child.id}/goals`)}
+                     >
+                       <Target className="w-4 h-4 mr-2" />
+                       Manage Goals
+                     </Button>
+                   </div>
 
                   {/* Login Credentials Section */}
                   <div className="pt-2 border-t space-y-2">

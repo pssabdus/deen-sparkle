@@ -45,24 +45,20 @@ interface LearningGoal {
 
 interface SetupData {
   childInfo: ChildInfo;
-  location: { latitude: number; longitude: number } | null;
-  prayerTimes: PrayerTimes | null;
+  enabledActivities: string[];
   personalityType: string;
   learningGoals: LearningGoal[];
-  weeklySchedule: any;
   preferences: {
     language: string;
-    calculationMethod: string;
     parentalControls: string[];
   };
 }
 
 const WIZARD_STEPS = [
   { id: 'child-info', title: 'Child Information', description: 'Basic details about your child' },
-  { id: 'location', title: 'Prayer Times Setup', description: 'Location for accurate prayer times' },
+  { id: 'activities', title: 'Islamic Activities', description: 'Choose what activities to enable' },
   { id: 'personality', title: 'Personality Quiz', description: 'Choose the perfect Islamic companion' },
   { id: 'goals', title: 'Learning Goals', description: 'Set Islamic learning objectives' },
-  { id: 'schedule', title: 'Weekly Schedule', description: 'Plan Islamic activities' },
   { id: 'preferences', title: 'Family Preferences', description: 'Customize the experience' },
   { id: 'preview', title: 'Preview & Confirm', description: 'Review your setup' }
 ];
@@ -133,14 +129,11 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
       interests: [],
       personalityType: ''
     },
-    location: null,
-    prayerTimes: null,
+    enabledActivities: [],
     personalityType: '',
     learningGoals: [],
-    weeklySchedule: {},
     preferences: {
       language: 'en',
-      calculationMethod: '',
       parentalControls: []
     }
   });
@@ -275,112 +268,76 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
     </div>
   );
 
-  // Step 2: Location & Prayer Times
-  const getLocation = async () => {
-    setLoading(true);
-    try {
-      if (!navigator.geolocation) {
-        throw new Error('Geolocation is not supported by this browser');
-      }
+  // Step 2: Activities Selection
+  const renderActivitiesStep = () => {
+    const activities = [
+      { id: 'prayers', name: 'Daily Prayers', description: 'Track 5 daily prayers', icon: '🤲' },
+      { id: 'stories', name: 'Islamic Stories', description: 'Read and listen to stories', icon: '📚' },
+      { id: 'quran', name: 'Quran Learning', description: 'Memorize verses and surahs', icon: '📖' },
+      { id: 'good_deeds', name: 'Good Deeds', description: 'Track daily acts of kindness', icon: '❤️' },
+      { id: 'dua', name: 'Dua Learning', description: 'Learn daily supplications', icon: '🤲' },
+      { id: 'games', name: 'Learning Games', description: 'Interactive Islamic games', icon: '🎮' }
+    ];
 
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
-      });
+    return (
+      <div className="space-y-6">
+        <div className="text-center mb-6">
+          <h3 className="text-xl font-semibold mb-2">Choose Activities</h3>
+          <p className="text-muted-foreground">
+            Select which Islamic activities you want to enable for your child
+          </p>
+        </div>
 
-      const { latitude, longitude } = position.coords;
-      setSetupData(prev => ({
-        ...prev,
-        location: { latitude, longitude }
-      }));
-
-      // Fetch prayer times
-      const { data, error } = await supabase.functions.invoke('prayer-times-api', {
-        body: { latitude, longitude }
-      });
-
-      if (error) throw error;
-
-      if (data.success) {
-        setSetupData(prev => ({
-          ...prev,
-          prayerTimes: data.prayerTimes
-        }));
-        toast({
-          title: "Success!",
-          description: "Prayer times configured successfully",
-        });
-      } else {
-        throw new Error(data.error);
-      }
-    } catch (error) {
-      console.error('Error getting location:', error);
-      toast({
-        title: "Error",
-        description: "Failed to get location and prayer times",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const renderLocationStep = () => (
-    <div className="space-y-6 text-center">
-      <div className="mx-auto w-24 h-24 bg-islamic-green/10 rounded-full flex items-center justify-center">
-        <MapPin className="w-12 h-12 text-islamic-green" />
-      </div>
-      
-      <div>
-        <h3 className="text-xl font-semibold mb-2">Set Up Prayer Times</h3>
-        <p className="text-muted-foreground">
-          We'll use your location to provide accurate prayer times for your family
-        </p>
-      </div>
-
-      {!setupData.location ? (
-        <Button onClick={getLocation} disabled={loading} className="w-full">
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Getting Location...
-            </>
-          ) : (
-            <>
-              <MapPin className="w-4 h-4 mr-2" />
-              Get My Location
-            </>
-          )}
-        </Button>
-      ) : (
-        <div className="space-y-4">
-          <div className="flex items-center justify-center text-green-600">
-            <CheckCircle className="w-5 h-5 mr-2" />
-            Location detected successfully!
-          </div>
-          
-          {setupData.prayerTimes && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-5 h-5" />
-                  Today's Prayer Times
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>Fajr: {setupData.prayerTimes.fajr}</div>
-                  <div>Dhuhr: {setupData.prayerTimes.dhuhr}</div>
-                  <div>Asr: {setupData.prayerTimes.asr}</div>
-                  <div>Maghrib: {setupData.prayerTimes.maghrib}</div>
-                  <div>Isha: {setupData.prayerTimes.isha}</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {activities.map((activity) => (
+            <Card 
+              key={activity.id}
+              className={`cursor-pointer transition-all ${
+                setupData.enabledActivities.includes(activity.id) 
+                  ? 'border-islamic-green bg-islamic-green/10' 
+                  : 'hover:border-islamic-gold'
+              }`}
+              onClick={() => {
+                const isEnabled = setupData.enabledActivities.includes(activity.id);
+                setSetupData(prev => ({
+                  ...prev,
+                  enabledActivities: isEnabled
+                    ? prev.enabledActivities.filter(id => id !== activity.id)
+                    : [...prev.enabledActivities, activity.id]
+                }));
+              }}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="text-2xl">{activity.icon}</div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold">{activity.name}</h4>
+                    <p className="text-sm text-muted-foreground">{activity.description}</p>
+                  </div>
+                  <div className="w-5 h-5 rounded-full border-2 border-muted-foreground flex items-center justify-center">
+                    {setupData.enabledActivities.includes(activity.id) && (
+                      <div className="w-3 h-3 rounded-full bg-islamic-green"></div>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
-          )}
+          ))}
         </div>
-      )}
-    </div>
-  );
+
+        {setupData.enabledActivities.length > 0 && (
+          <Card className="bg-islamic-green/10">
+            <CardContent className="p-4">
+              <p className="text-sm text-islamic-green">
+                ✓ {setupData.enabledActivities.length} activities selected. 
+                You can always change these later in the parent dashboard.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    );
+  };
 
   // Step 3: Personality Quiz
   const renderPersonalityStep = () => {
@@ -641,27 +598,6 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
           </Select>
         </div>
 
-        <div>
-          <Label>Prayer Calculation Method</Label>
-          <Select
-            value={setupData.preferences.calculationMethod}
-            onValueChange={(value) => setSetupData(prev => ({
-              ...prev,
-              preferences: { ...prev.preferences, calculationMethod: value }
-            }))}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select calculation method" />
-            </SelectTrigger>
-            <SelectContent>
-              {calculationMethods.map((method) => (
-                <SelectItem key={method.id} value={method.id}>
-                  {method.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
 
         <div>
           <Label>Parental Controls (Select multiple)</Label>
@@ -759,23 +695,21 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
 
   // Navigation functions
   const canProceed = () => {
-    switch (currentStep) {
-      case 0:
+    switch (WIZARD_STEPS[currentStep].id) {
+      case 'child-info':
         return setupData.childInfo.name && setupData.childInfo.dateOfBirth && setupData.childInfo.gender;
-      case 1:
-        return setupData.location && setupData.prayerTimes;
-      case 2:
+      case 'activities':
+        return setupData.enabledActivities.length > 0;
+      case 'personality':
         return personalityAnswers.length === PERSONALITY_QUESTIONS.length;
-      case 3:
+      case 'goals':
         return setupData.learningGoals.length > 0;
-      case 4:
-        return true; // Schedule is optional
-      case 5:
-        return setupData.preferences.language && setupData.preferences.calculationMethod;
-      case 6:
-        return true; // Final review
-      default:
+      case 'preferences':
+        return true; // Optional step
+      case 'preview':
         return true;
+      default:
+        return false;
     }
   };
 
@@ -810,7 +744,7 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
           interests: setupData.childInfo.interests,
           personality_answers: personalityAnswers
         },
-        learning_schedule: setupData.weeklySchedule,
+        learning_schedule: {},
         preferences: {
           interests: setupData.childInfo.interests,
           personality_answers: personalityAnswers
@@ -847,11 +781,10 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
       // Create family Islamic preferences
       const preferencesData = {
         family_id: familyId,
-        prayer_method_id: setupData.preferences.calculationMethod,
         preferred_language: setupData.preferences.language,
         learning_preferences: {
           parental_controls: setupData.preferences.parentalControls,
-          weekly_schedule: setupData.weeklySchedule
+          enabled_activities: setupData.enabledActivities
         }
       };
 
@@ -861,15 +794,15 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
 
       if (preferencesError) throw preferencesError;
 
-      // Set up prayer times if available
-      if (setupData.prayerTimes && childRecord) {
+      // Set up daily prayers if prayers activity is enabled
+      if (setupData.enabledActivities.includes('prayers') && childRecord) {
         const today = new Date().toISOString().split('T')[0];
         const prayerTimeEntries = [
-          { child_id: childRecord.id, prayer_name: 'Fajr', scheduled_time: setupData.prayerTimes.fajr, prayer_date: today },
-          { child_id: childRecord.id, prayer_name: 'Dhuhr', scheduled_time: setupData.prayerTimes.dhuhr, prayer_date: today },
-          { child_id: childRecord.id, prayer_name: 'Asr', scheduled_time: setupData.prayerTimes.asr, prayer_date: today },
-          { child_id: childRecord.id, prayer_name: 'Maghrib', scheduled_time: setupData.prayerTimes.maghrib, prayer_date: today },
-          { child_id: childRecord.id, prayer_name: 'Isha', scheduled_time: setupData.prayerTimes.isha, prayer_date: today }
+          { child_id: childRecord.id, prayer_name: 'Fajr', prayer_date: today },
+          { child_id: childRecord.id, prayer_name: 'Dhuhr', prayer_date: today },
+          { child_id: childRecord.id, prayer_name: 'Asr', prayer_date: today },
+          { child_id: childRecord.id, prayer_name: 'Maghrib', prayer_date: today },
+          { child_id: childRecord.id, prayer_name: 'Isha', prayer_date: today }
         ];
 
         const { error: prayerError } = await supabase
@@ -898,15 +831,21 @@ const ParentSetupWizard: React.FC<{ familyId: string; onComplete: () => void }> 
   };
 
   const renderCurrentStep = () => {
-    switch (currentStep) {
-      case 0: return renderChildInfoStep();
-      case 1: return renderLocationStep();
-      case 2: return renderPersonalityStep();
-      case 3: return renderGoalsStep();
-      case 4: return renderScheduleStep();
-      case 5: return renderPreferencesStep();
-      case 6: return renderPreviewStep();
-      default: return null;
+    switch (WIZARD_STEPS[currentStep].id) {
+      case 'child-info':
+        return renderChildInfoStep();
+      case 'activities':
+        return renderActivitiesStep();
+      case 'personality':
+        return renderPersonalityStep();
+      case 'goals':
+        return renderGoalsStep();
+      case 'preferences':
+        return renderPreferencesStep();
+      case 'preview':
+        return renderPreviewStep();
+      default:
+        return null;
     }
   };
 
